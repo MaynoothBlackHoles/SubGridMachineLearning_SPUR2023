@@ -3,8 +3,17 @@ import torch
 def train_loop(dataset, model, loss_fn, device, optimizer, correct_list, loss_list):
 	total_loss = 0
 	total_correct = 0
+        
+	batches = (len(dataset))
+	batch_size = len(dataset[0][1])
+	size = batches * batch_size
     
-	for (x, y) in dataset:
+	for batch, (x, y) in enumerate(dataset):
+		
+		if (batch + 1) % 5 == 0:
+			percentage = round(100 * ((batch + 1)/batches), 1)
+			print(f"Training epoch {percentage}% done", end="\r")
+
 		(x, y) = (x.to(device), y.to(device))
 		
 		prediction = model(x)
@@ -18,10 +27,8 @@ def train_loop(dataset, model, loss_fn, device, optimizer, correct_list, loss_li
 		total_loss += loss
 		total_correct += (prediction.argmax(1) == y).type(torch.float).sum().item()
 
-	batches = (len(dataset))
-	batch_size = len(dataset[0][1])
 	avg_loss = total_loss / batches
-	correct = total_correct / (batches * batch_size)
+	correct = total_correct / size
 
 	print(f"Train Error: \n Accuracy: {(correct):.2f}, Avg loss: {avg_loss:.3f} \n")
 	correct_list.append(correct)
