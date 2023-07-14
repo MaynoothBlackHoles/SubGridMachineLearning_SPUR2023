@@ -61,7 +61,7 @@ class conv1(torch.nn.Module):
 		return self.stack(x)
 
 class Kernel1_conv(torch.nn.Module):
-	def __init__(self, box_length, numChannels=5, scnd_outchannels=40, classes=2):
+	def __init__(self, box_length, numChannels=5, classes=2):
 		super(Kernel1_conv, self).__init__()
 
 		self.stack = nn.Sequential(
@@ -69,12 +69,12 @@ class Kernel1_conv(torch.nn.Module):
 			nn.ReLU(),
 			nn.MaxPool3d(kernel_size=2, stride=2),
 
-			nn.Conv3d(in_channels=20, out_channels=scnd_outchannels, kernel_size=1, stride=1),
+			nn.Conv3d(in_channels=20, out_channels=40, kernel_size=1, stride=1),
 			nn.ReLU(),
 			nn.MaxPool3d(kernel_size=2, stride=2),
 
 			nn.Flatten(),
-			nn.Linear(in_features=2560, out_features=100),
+			nn.Linear(in_features=40 * int(round((box_length/4)**3)), out_features=100), #2560
 			nn.ReLU(),
 
 			nn.Linear(in_features=100, out_features=classes),
@@ -84,21 +84,38 @@ class Kernel1_conv(torch.nn.Module):
 	def forward(self, x):
 		return self.stack(x)
 
+	
 class Kernel1_conv_big(torch.nn.Module):
 	def __init__(self, box_length, numChannels=5, classes=2):
 		super(Kernel1_conv_big, self).__init__()
 
 		self.stack = nn.Sequential(
-			nn.Conv3d(in_channels=numChannels, out_channels=20, kernel_size=7, stride=2),
+			nn.Conv3d(in_channels=numChannels, out_channels=20, kernel_size=1, stride=1),
 			nn.ReLU(),
 			nn.MaxPool3d(kernel_size=2, stride=2),
 
-			nn.Conv3d(in_channels=20, out_channels=40, kernel_size=5, stride=2),
+			nn.Conv3d(in_channels=20, out_channels=40, kernel_size=1, stride=1),
+			nn.ReLU(),
+			nn.MaxPool3d(kernel_size=2, stride=2),
+
+			nn.Conv3d(in_channels=40, out_channels=60, kernel_size=1, stride=1),
+			nn.ReLU(),
+			nn.MaxPool3d(kernel_size=2, stride=2),
+
+			nn.Conv3d(in_channels=60, out_channels=80, kernel_size=1, stride=1),
+			nn.ReLU(),
+			nn.MaxPool3d(kernel_size=2, stride=2),
+
+			nn.Conv3d(in_channels=80, out_channels=100, kernel_size=1, stride=1),
+			nn.ReLU(),
+			nn.MaxPool3d(kernel_size=2, stride=2),
+
+			nn.Conv3d(in_channels=100, out_channels=120, kernel_size=1, stride=1),
 			nn.ReLU(),
 			nn.MaxPool3d(kernel_size=2, stride=2),
 
 			nn.Flatten(),
-			nn.Linear(in_features=320, out_features=100),
+			nn.Linear(in_features=120, out_features=100),
 			nn.ReLU(),
 
 			nn.Linear(in_features=100, out_features=classes),
@@ -108,7 +125,34 @@ class Kernel1_conv_big(torch.nn.Module):
 	def forward(self, x):
 		return self.stack(x)	
 		
-	
+class Kernel1_conv_big1(torch.nn.Module):
+	def __init__(self, box_length, numChannels=5, classes=2):
+		super(Kernel1_conv_big1, self).__init__()
+
+		self.stack = nn.Sequential(
+			nn.Conv3d(in_channels=numChannels, out_channels=20, kernel_size=1, stride=1),
+			nn.ReLU(),
+			nn.MaxPool3d(kernel_size=4, stride=4),
+
+			nn.Conv3d(in_channels=20, out_channels=50, kernel_size=1, stride=1),
+			nn.ReLU(),
+			nn.MaxPool3d(kernel_size=4, stride=4),
+
+			nn.Conv3d(in_channels=50, out_channels=100, kernel_size=1, stride=1),
+			nn.ReLU(),
+			nn.MaxPool3d(kernel_size=4, stride=4),
+
+			nn.Flatten(),
+			nn.Linear(in_features=100, out_features=500),
+			nn.ReLU(),
+
+			nn.Linear(in_features=500, out_features=classes),
+			nn.Softmax(dim=1)
+			)
+		
+	def forward(self, x):
+		return self.stack(x)	
+		
 class S1(torch.nn.Module):
 	def __init__(self, N_0, box_length=64, numChannels=5, classes=2, p_dropout=0.2):
 		super(S1, self).__init__()
