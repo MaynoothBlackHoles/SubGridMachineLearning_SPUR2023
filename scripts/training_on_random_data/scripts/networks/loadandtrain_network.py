@@ -1,3 +1,7 @@
+"""
+Script for loading saved weights of previously trained network and training it further
+"""
+
 import torch
 from torch import nn
 import matplotlib.pyplot as plt
