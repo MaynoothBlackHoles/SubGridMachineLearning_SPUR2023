@@ -1,5 +1,7 @@
 import sys
-sys.path.append("C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/training_on_random_data")
+import os
+current_dir = os.getcwd()
+sys.path.append(current_dir)
 from src import subgridmodel as sgm
 import time
 

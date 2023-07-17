@@ -117,7 +117,7 @@ def generate_log_tensor(box_lenght):
     return torch.stack(tensor, dim=0)
 
 
-def gen_fast_classified_data(size, box_lenght, max_stars=5):
+def gen_fast_classified_data(size, box_lenght, max_stars=5, min_stars=1):
     data = []
     classification = []
 
@@ -133,7 +133,7 @@ def gen_fast_classified_data(size, box_lenght, max_stars=5):
         star_forming = random.randint(0,1)
         if star_forming:
 
-            num_stars = random.randint(1, max_stars)
+            num_stars = random.randint(min_stars, max_stars)
 
             for i in range(num_stars):
                 x = random.randint(0, box_lenght - 1)
@@ -216,3 +216,29 @@ def star_forming_ratio(classified_dataset):
     for i in range(size):
         total_starforming += calssification[i]
     return round(float(total_starforming / size), 2)
+
+def tensor_slicer(tensor, output_lenght):
+    matrices, x, y, z = tensor.shape
+    slices = []
+
+    for i in range(int(round(x/output_lenght))):
+        for j in range(int(round(y/output_lenght))):
+            for k in range(int(round(z/output_lenght))):
+                x_start = i * output_lenght
+                y_start = j * output_lenght
+                z_start = k * output_lenght
+                tensor_slice = tensor[:, x_start : x_start + output_lenght,
+                                         y_start : y_start + output_lenght,
+                                         z_start : z_start + output_lenght]
+                tensor_slice = torch.reshape(tensor_slice, (1, matrices, output_lenght, output_lenght, output_lenght))
+                slices.append(tensor_slice)
+    
+    return slices
+
+def classified_data_slicer(classified_data, output_lenght):
+    sliced_data = []
+    for i, tensor in enumerate(classified_data[0]):
+        sliced_tensor = tensor_slicer(tensor, output_lenght)
+        sliced_data.append((sliced_tensor, classified_data[1][i]))
+    return sliced_data
+        

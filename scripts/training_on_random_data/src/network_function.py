@@ -10,7 +10,7 @@ def train_loop(dataset, model, loss_fn, device, optimizer, correct_list, loss_li
     
 	for batch, (x, y) in enumerate(dataset):
 		
-		if (batch + 1) % 5 == 0:
+		if (batch + 1) % 2 == 0:
 			percentage = round(100 * ((batch + 1)/batches), 1)
 			print(f"Training epoch {percentage}% done", end="\r")
 
@@ -57,3 +57,28 @@ def test_loop(dataset, model, loss_fn, device, correct_list, loss_list):
     print(f"Test Error: \n Accuracy: {(correct):.2f}, Avg loss: {avg_loss:.3f} \n")
     correct_list.append(correct)
     loss_list.append(avg_loss)
+    
+def test_(dataset, model,device):
+    model.eval()
+
+    total_correct = 0
+
+    with torch.no_grad():
+        for X, y in dataset:
+            y = y.to(device)
+
+            star_forming_slices = 0
+            for i, tensor in enumerate(X):
+                prediction = model(tensor)
+                if prediction.argmax(1) == 1:
+                    star_forming_slices += 1
+                    break
+                 	    
+            #total_loss += loss_fn(prediction, y).item()
+            if star_forming_slices == int(y):
+                total_correct += 1
+	    	
+    size = len(dataset)
+    correct = total_correct / size
+
+    print(f"Test Error: \n Accuracy: {(correct):.2f} \n")
