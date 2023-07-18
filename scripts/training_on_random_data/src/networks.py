@@ -1,3 +1,7 @@
+"""
+File which holds network architectures
+"""
+
 import torch
 from torch import nn
 

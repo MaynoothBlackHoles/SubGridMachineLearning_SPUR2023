@@ -1,3 +1,7 @@
+"""
+Script for loading a trained network and checking its accuracy and loss on chosed dataset
+"""
+
 import torch
 from torch import nn
 import sys
@@ -22,12 +26,11 @@ test_data = torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Progr
 print("[INFO] Batching Data")
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
 
-dictionary = {"train accuracy": [], "train loss": [], "test accuracy": [], "test loss": []}
+dictionary = {"test accuracy": [], "test loss": []}
  
 print("[INFO] Testing Network")
 nf.test_loop(test_data, model, loss_fn, device, dictionary["test accuracy"], dictionary["test loss"])
 
 print("[INFO] Done! :D")
-#torch.save(model.state_dict(), "Kernel1_conv.pt")
 
 

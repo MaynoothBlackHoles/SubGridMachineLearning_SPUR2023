@@ -1,3 +1,7 @@
+"""
+Script used to train networks with chosen architecture and datasets
+"""
+
 import torch
 from torch import nn
 import matplotlib.pyplot as plt
@@ -18,10 +22,12 @@ BL = 16
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# loadng network architecture, choosing optimiser and loss function
 model = net.Kernel1_conv(box_length=BL).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.CrossEntropyLoss()
 
+# loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
 train_data = torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/training_on_random_data/random data/fast {BL} cubed/training.pt")
 test_data = torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/training_on_random_data/random data/fast {BL} cubed/validation.pt")
@@ -30,7 +36,7 @@ train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
 
 dictionary = {"train accuracy": [], "train loss": [], "test accuracy": [], "test loss": []}
- 
+
 print("[INFO] Training Network")
 epoch_num = 0
 for i in range(EPOCHS):
@@ -38,12 +44,14 @@ for i in range(EPOCHS):
     print(f"[INFO] Epoch {i + 1} ---------------------------")
     time_start = time.time()
 
+    # training and evaluating network accuracy and loss
     nf.train_loop(train_data, model, loss_fn, device, optimizer, dictionary["train accuracy"], dictionary["train loss"])
     nf.test_loop(test_data, model, loss_fn, device, dictionary["test accuracy"], dictionary["test loss"])
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
 
+    # plot of training info which updates every epoch
     epochs_list = [i for i in range(1, epoch_num + 1)]
     plt.plot(epochs_list, dictionary["train accuracy"], label="train accuracy", color="green")
     plt.plot(epochs_list, dictionary["train loss"], "--", label="train loss", color="darkgreen")
@@ -54,7 +62,8 @@ for i in range(EPOCHS):
     plt.xlabel("Epoch")
     plt.savefig("plot")
 
-    torch.save(model.state_dict(), f"Kernel1_conv_{BL}c.pt") #C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/training_on_random_data/trained_networks/
+    # saving network weights 
+    torch.save(model.state_dict(), f"Kernel1_conv_{BL}c.pt")
 print("[INFO] Done! :D")
 
 plt.show()

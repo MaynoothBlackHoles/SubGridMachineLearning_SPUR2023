@@ -1,7 +1,17 @@
+"""
+Script to hold data generating, classifying, pre processing and testing functions
+"""
+
 import torch
 import random
 
-def check_pixel(tensor, x, y, z):
+
+def check_voxel(tensor, x, y, z):
+    """
+    Checks a if a given coorindate (x, y, z) of a tensor is star forming or not
+
+    return: True or False
+    """
 
     number_density = tensor[0, x, y, z]
     H2_fraction = tensor[1, x , y, z]
@@ -15,15 +25,24 @@ def check_pixel(tensor, x, y, z):
         return False
 
 def check_tensor(tensor, Full_list=False):
-    star_forming_pixels = []
+    """
+    Checks whether a tensor if star forming or not by checking if any entry is star forming.
+    
+     Variables
+    tensor: input tensor
+    Full_list: If this is set to be True then this function will output each entry of the tensor which is star forming in a list
+
+    return: True or False
+    """
 
     matrices, x, y, z = tensor.shape
+    star_forming_pixels = []
     
     if Full_list:
         for i in range(x):
             for j in range(y):
                 for k in range(z):
-                    if check_pixel(tensor, i, j, k):
+                    if check_voxel(tensor, i, j, k):
                         star_forming_pixels.append([i, j, k])
 
         return star_forming_pixels
@@ -33,7 +52,7 @@ def check_tensor(tensor, Full_list=False):
         for i in range(x):
             for j in range(y):
                 for k in range(z):
-                    if check_pixel(tensor, i, j, k):
+                    if check_voxel(tensor, i, j, k):
                         break_state = True
                         break
                 if break_state:
@@ -51,9 +70,10 @@ def check_starForming(tensor):
     
 
 def gen_uniform_tensor(box_lenght):
-    # maybe get max and min values for all
-
-    cool_factor = 1 / box_lenght #( 1 / (2 * (box_lenght**3)) )**(1/5)
+    """
+    Generates a tensor with uniformly disrtibued properties
+    """
+    cool_factor = 1 / box_lenght 
     ones_tensor = torch.ones(box_lenght, box_lenght, box_lenght)
 
     number_density = (cool_factor + 1) * 100 * torch.rand(box_lenght, box_lenght, box_lenght) 
@@ -117,49 +137,6 @@ def generate_log_tensor(box_lenght):
     return torch.stack(tensor, dim=0)
 
 
-def gen_fast_classified_data(size, box_lenght, max_stars=5, min_stars=1):
-    data = []
-    classification = []
-
-    for i in range(size):
-        if (i + 1) % 100 == 0:
-            percentage = round(100 * ((i + 1)/size), 1)
-            print(f" {percentage}% done", end="\r")
-
-        # generates a non star forming tensor
-        tensor = gen_NONstarforming_tensor(box_lenght)
-        
-        # filps a coin, and puts in some stars if flipped right
-        star_forming = random.randint(0,1)
-        if star_forming:
-
-            num_stars = random.randint(min_stars, max_stars)
-
-            for i in range(num_stars):
-                x = random.randint(0, box_lenght - 1)
-                y = random.randint(0, box_lenght - 1)
-                z = random.randint(0, box_lenght - 1)
-
-                nd = random.uniform(100, 110)
-                H2_f = random.uniform(1e-3, .1 * 1e-3)
-                fft = random.uniform(0.9, 1)
-                ct = random.uniform(1, 0.1)
-                div = random.uniform(-0.1, 0)
-
-                tensor[0, x, y, z] = nd
-                tensor[1, x, y, z] = H2_f
-                tensor[2, x, y, z] = fft
-                tensor[3, x, y, z] = ct
-                tensor[4, x, y, z] = div
-
-        data.append(tensor)
-        classification.append(torch.tensor(star_forming))
-
-    data = torch.stack(data, dim=0)
-    classification = torch.stack(classification, dim=0)
-    return (data, classification)
-    
-
 def generate_dataset(size, box_lenght, tensor_generator=gen_uniform_tensor):
     dataset = []
     for i in range(size):
@@ -209,7 +186,69 @@ def gen_batched_classified_data(size, box_length, batch_size, tensor_generator=g
     return batched_data
 
 
+def gen_fast_classified_data(size, box_lenght, max_stars=5, min_stars=1):
+    """
+    Creates a dataset with uniformly distributed properties by generating a non star forming tensor,
+    and randomly deciding whether to make it a star forming tensor by randomly inserting star forming
+    regions. Significantly faster generation for large datasets with large tensors.
+
+     Variables
+    size: desired amount of tensors in dataset
+    boz_lenght: length of the sides of the "cube" to be generated
+
+    return: tuple of list of tensors and list of classification
+    """
+    data = []
+    classification = []
+
+    for i in range(size):
+
+        # progress tracker
+        if (i + 1) % 100 == 0:
+            percentage = round(100 * ((i + 1)/size), 1)
+            print(f" {percentage}% done", end="\r")
+
+        # generates a non star forming tensor
+        tensor = gen_NONstarforming_tensor(box_lenght)
+        
+        # 50% chance to decide on star forming
+        star_forming = random.randint(0,1)
+        if star_forming:
+
+            num_stars = random.randint(min_stars, max_stars)
+
+            # creates star forming voxel properties and replaces existing properties in tensor
+            for i in range(num_stars):
+                x = random.randint(0, box_lenght - 1)
+                y = random.randint(0, box_lenght - 1)
+                z = random.randint(0, box_lenght - 1)
+
+                nd = random.uniform(100, 110)
+                H2_f = random.uniform(1e-3, .1 * 1e-3)
+                fft = random.uniform(0.9, 1)
+                ct = random.uniform(1, 0.1)
+                div = random.uniform(-0.1, 0)
+
+                tensor[0, x, y, z] = nd
+                tensor[1, x, y, z] = H2_f
+                tensor[2, x, y, z] = fft
+                tensor[3, x, y, z] = ct
+                tensor[4, x, y, z] = div
+
+        # adding tensor to list and classification to list
+        data.append(tensor)
+        classification.append(torch.tensor(star_forming))
+
+    # converts both lists into pytorch tensors
+    data = torch.stack(data, dim=0)
+    classification = torch.stack(classification, dim=0)
+
+    return (data, classification)
+
 def star_forming_ratio(classified_dataset):
+    """
+    Calculates ratio of star forming tensor to non star forming tensors in a classified dataset
+    """
     calssification = classified_dataset[1]
     size = len(calssification)
     total_starforming = 0
@@ -218,6 +257,16 @@ def star_forming_ratio(classified_dataset):
     return round(float(total_starforming / size), 2)
 
 def tensor_slicer(tensor, output_lenght):
+    """
+    Slices given tensor into smaller volumes of desired side lenght
+
+     Variables
+    tensor: input tensor
+    output_lenght: desired side lenght slices of tensor
+
+    return: list of slices of tensor
+    """
+
     matrices, x, y, z = tensor.shape
     slices = []
 
@@ -236,6 +285,9 @@ def tensor_slicer(tensor, output_lenght):
     return slices
 
 def classified_data_slicer(classified_data, output_lenght):
+    """
+    Creates a new dataset which replaces tensors with a list of slices from tensor
+    """
     sliced_data = []
     for i, tensor in enumerate(classified_data[0]):
         sliced_tensor = tensor_slicer(tensor, output_lenght)
