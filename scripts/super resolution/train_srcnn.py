@@ -6,11 +6,12 @@ import torch
 from torch import nn
 import matplotlib.pyplot as plt
 import time
-
 import sys
+
 import os
 current_dir = os.getcwd()
-os.chdir(current_dir + "/..")
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+sys.path.append(parent_dir)
 
 from src import network_function as nf
 from src import sr_networks as net
@@ -33,8 +34,8 @@ print(f"Number of parameters: {total_params}")
 
 # loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/training_500s.pt")
-test_data = torch.load(current_dir + f"/data/validation_500s.pt")
+train_data = torch.load(current_dir +  f"/data/training.pt")
+test_data = torch.load(current_dir + f"/data/validation.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
@@ -73,7 +74,7 @@ for i in range(EPOCHS):
 
     plt.savefig("plot")
     # saving network weights 
-    torch.save(model.state_dict(), f"srcnn100.pt")
+    torch.save(model.state_dict(), f"srcnn500.pt")
 print("[INFO] Done! :D")
 
 plt.show()
