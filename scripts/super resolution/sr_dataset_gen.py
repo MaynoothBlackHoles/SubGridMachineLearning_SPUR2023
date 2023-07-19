@@ -3,8 +3,11 @@ import torchvision.transforms.v2 as transforms
 import torchvision
 import torch
 
-IMAGE_SIZE = 50
-LOW_RES = 20
+import os
+current_dir = os.getcwd()
+
+IMAGE_SIZE = 500
+LOW_RES = int(IMAGE_SIZE/3)
 
 RE_SCALED_SIZE = IMAGE_SIZE + 12
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
@@ -23,16 +26,13 @@ data_downscale = transforms.Compose([
 
 trainData = torchvision.datasets.Flowers102(root="data", split="train", download=True, transform=data_transform)
 downscaled_trainData = torchvision.datasets.Flowers102(root="data", split="train", download=True, transform=data_downscale)
-
-valData = torchvision.datasets.Flowers102(root="data", split="val", download=True, transform=data_transform)
-downscaled_valData = torchvision.datasets.Flowers102(root="data", split="val", download=True, transform=data_downscale)
-
 trainDataLoader = DataLoader(trainData, )
 downscaled_trainDataLoader = DataLoader(downscaled_trainData)
 
+"""valData = torchvision.datasets.Flowers102(root="data", split="test", download=True, transform=data_transform)
+downscaled_valData = torchvision.datasets.Flowers102(root="data", split="val", download=True, transform=data_downscale)
 valDataLoader = DataLoader(valData)
-downscaled_valDataLoader = DataLoader(downscaled_valData)
-
+downscaled_valDataLoader = DataLoader(downscaled_valData)"""
 
 def extract_images(dataLoader, img_size):
     tensors = []
@@ -43,15 +43,19 @@ def extract_images(dataLoader, img_size):
 
 tensor_trainData = extract_images(trainDataLoader, IMAGE_SIZE)
 tensor_downscaled_trainData = extract_images(downscaled_trainDataLoader, RE_SCALED_SIZE)
-tensor_valData = extract_images(valDataLoader, IMAGE_SIZE)
-tensor_downscaled_ValData = extract_images(downscaled_trainData, RE_SCALED_SIZE)
+#tensor_valData = extract_images(valDataLoader, IMAGE_SIZE)
+#tensor_downscaled_ValData = extract_images(downscaled_trainData, RE_SCALED_SIZE)
 
 def save_data(dataset, name):
-    torch.save(dataset, f"C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/super resolution/data/{name}.pt")
+    torch.save(dataset, current_dir + f"/data/{name}.pt")
 
-training = (tensor_downscaled_trainData, tensor_trainData)
-validation = (tensor_downscaled_ValData, tensor_valData)
+size = len(tensor_trainData)
+print(size)
+split_num = int(size * 0.1)
 
-save_data(training, name="training_50s")
-save_data(validation, name="validation_50s")
+training = (tensor_downscaled_trainData[:split_num], tensor_trainData[:split_num])
+validation = (tensor_downscaled_trainData[split_num:], tensor_trainData[split_num:])
+
+save_data(training, name=f"training_{IMAGE_SIZE}s")
+save_data(validation, name=f"validation_{IMAGE_SIZE}s")
     
