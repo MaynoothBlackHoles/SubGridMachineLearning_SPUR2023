@@ -34,8 +34,8 @@ print(f"Number of parameters: {total_params}")
 
 # loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/training.pt")
-test_data = torch.load(current_dir + f"/data/validation.pt")
+train_data = torch.load(current_dir +  f"/data/training_500s.pt")
+test_data = torch.load(current_dir + f"/data/validation_500s.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
