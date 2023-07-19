@@ -10,7 +10,7 @@ import time
 import sys
 import os
 current_dir = os.getcwd()
-os.chdir(current_dir + /..)
+os.chdir(current_dir + "/..")
 
 from src import network_function as nf
 from src import sr_networks as net
