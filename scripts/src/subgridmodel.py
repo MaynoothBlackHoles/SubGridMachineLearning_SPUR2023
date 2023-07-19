@@ -161,7 +161,6 @@ def batch_classified_data(classified_dataset, batch_size):
         data.append(classified_dataset[0][i])
         classification.append(classified_dataset[1][i])
 
-        # this fucker i needed to have brackets here.....
         if (i+1) % batch_size == 0:
             data = torch.stack(data)
             classification = torch.stack(classification)
@@ -245,6 +244,7 @@ def gen_fast_classified_data(size, box_lenght, max_stars=5, min_stars=1):
 
     return (data, classification)
 
+
 def star_forming_ratio(classified_dataset):
     """
     Calculates ratio of star forming tensor to non star forming tensors in a classified dataset
@@ -256,13 +256,14 @@ def star_forming_ratio(classified_dataset):
         total_starforming += calssification[i]
     return round(float(total_starforming / size), 2)
 
+
 def tensor_slicer(tensor, output_lenght):
     """
     Slices given tensor into smaller volumes of desired side lenght
 
      Variables
     tensor: input tensor
-    output_lenght: desired side lenght slices of tensor
+    output_lenght: desired side lenght for slices of tensor
 
     return: list of slices of tensor
     """
