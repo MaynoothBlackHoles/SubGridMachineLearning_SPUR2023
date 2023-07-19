@@ -6,14 +6,15 @@ import torch
 from torch import nn
 import matplotlib.pyplot as plt
 import time
-import sys
 
+import sys
 import os
 current_dir = os.getcwd()
+os.chdir(current_dir + /..)
 
-from ..src import network_function as nf
-from ..src import sr_networks as net
-from ..src import subgridmodel as sgm
+from src import network_function as nf
+from src import sr_networks as net
+from src import subgridmodel as sgm
 
 # hyperparameters
 LEARNING_RATE = 1e-4
@@ -32,8 +33,8 @@ print(f"Number of parameters: {total_params}")
 
 # loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/training.pt")
-test_data = torch.load(current_dir + f"/data/validation.pt")
+train_data = torch.load(current_dir +  f"/data/training_500s.pt")
+test_data = torch.load(current_dir + f"/data/validation_500s.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
