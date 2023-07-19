@@ -24,8 +24,8 @@ data_downscale = transforms.Compose([
     transforms.ToTensor()
 ])
 
-trainData = torchvision.datasets.Flowers102(root="data", split="train", download=True, transform=data_transform)
-downscaled_trainData = torchvision.datasets.Flowers102(root="data", split="train", download=True, transform=data_downscale)
+trainData = torchvision.datasets.Flowers102(root="data", split="test", download=True, transform=data_transform)
+downscaled_trainData = torchvision.datasets.Flowers102(root="data", split="test", download=True, transform=data_downscale)
 trainDataLoader = DataLoader(trainData, )
 downscaled_trainDataLoader = DataLoader(downscaled_trainData)
 
@@ -51,7 +51,7 @@ def save_data(dataset, name):
 
 size = len(tensor_trainData)
 print(size)
-split_num = int(size * 0.1)
+split_num = int(size * 0.9)
 
 training = (tensor_downscaled_trainData[:split_num], tensor_trainData[:split_num])
 validation = (tensor_downscaled_trainData[split_num:], tensor_trainData[split_num:])

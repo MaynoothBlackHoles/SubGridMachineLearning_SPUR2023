@@ -22,6 +22,8 @@ LEARNING_RATE = 1e-4
 EPOCHS = 100
 BATCH_SIZE = 32 # dont make too big, fails to allocate memory
 
+IMAGE_SIZE = 500
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
@@ -34,8 +36,8 @@ print(f"Number of parameters: {total_params}")
 
 # loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/training_500s.pt")
-test_data = torch.load(current_dir + f"/data/validation_500s.pt")
+train_data = torch.load(current_dir +  f"/data/training_{IMAGE_SIZE}s.pt")
+test_data = torch.load(current_dir + f"/data/validation_{IMAGE_SIZE}s.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
@@ -74,7 +76,7 @@ for i in range(EPOCHS):
 
     plt.savefig("plot")
     # saving network weights 
-    torch.save(model.state_dict(), f"srcnn500.pt")
+    torch.save(model.state_dict(), f"srcnn{IMAGE_SIZE}.pt")
 print("[INFO] Done! :D")
 
 plt.show()
