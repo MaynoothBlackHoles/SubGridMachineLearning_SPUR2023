@@ -9,7 +9,7 @@ current_dir = os.getcwd()
 IMAGE_SIZE = 500
 LOW_RES = int(IMAGE_SIZE/3)
 
-RE_SCALED_SIZE = IMAGE_SIZE + 12
+RE_SCALED_SIZE = IMAGE_SIZE #+ 12
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 data_transform = transforms.Compose([
@@ -24,8 +24,8 @@ data_downscale = transforms.Compose([
     transforms.ToTensor()
 ])
 
-trainData = torchvision.datasets.Flowers102(root="data", split="test", download=True, transform=data_transform)
-downscaled_trainData = torchvision.datasets.Flowers102(root="data", split="test", download=True, transform=data_downscale)
+trainData = torchvision.datasets.Flowers102(root="data", split="train", download=True, transform=data_transform)
+downscaled_trainData = torchvision.datasets.Flowers102(root="data", split="train", download=True, transform=data_downscale)
 trainDataLoader = DataLoader(trainData, )
 downscaled_trainDataLoader = DataLoader(downscaled_trainData)
 

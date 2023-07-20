@@ -6,8 +6,9 @@ import torch
 from torch import nn
 import matplotlib.pyplot as plt
 import time
-import sys
+import numpy as np
 
+import sys
 import os
 current_dir = os.getcwd()
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
@@ -20,7 +21,7 @@ from src import subgridmodel as sgm
 # hyperparameters
 LEARNING_RATE = 1e-4
 EPOCHS = 100
-BATCH_SIZE = 32 # dont make too big, fails to allocate memory
+BATCH_SIZE = 128
 
 IMAGE_SIZE = 500
 
@@ -59,24 +60,28 @@ for i in range(EPOCHS):
 
     # plot of training info which updates every epoch
     epochs_list = [i for i in range(1, epoch_num + 1)]
+    ones_list = np.ones(i + 1)
 
     plt.subplot(121)
-    plt.plot(epochs_list, dictionary["train PSNR"], label="train PSNR", color="green")
-    plt.plot(epochs_list, dictionary["test PSNR"], label="test PSNR", color="red")
+    plt.plot(epochs_list, dictionary["train PSNR"], label="train", color="green")
+    plt.plot(epochs_list, dictionary["test PSNR"], label="test", color="red")
+    plt.plot(epochs_list, ones_list * 81.25, label="bicubic", color="blue")
     plt.xlabel("Epoch")
+    plt.ylabel("PSNR")
     if epoch_num == 1:
         plt.legend()
 
     plt.subplot(122)
-    plt.plot(epochs_list, dictionary["train loss"], "--", label="train loss", color="darkgreen")
-    plt.plot(epochs_list, dictionary["test loss"], "--", label="test loss", color="darkred")
+    plt.plot(epochs_list, dictionary["train loss"], "--", label="train", color="lightgreen")
+    plt.plot(epochs_list, dictionary["test loss"], "--", label="test", color="lightred")
     if epoch_num == 1:
         plt.legend()
     plt.xlabel("Epoch")
+    plt.ylabel("Loss")
 
     plt.savefig("plot")
-    # saving network weights 
     torch.save(model.state_dict(), f"srcnn{IMAGE_SIZE}.pt")
+    
 print("[INFO] Done! :D")
 
 plt.show()
