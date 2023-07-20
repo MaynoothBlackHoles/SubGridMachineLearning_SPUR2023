@@ -22,6 +22,7 @@ data_cropToTensor = transforms.Compose([
 ])
 
 data_downscale = transforms.Compose([
+	transforms.CenterCrop(IMAGE_SIZE),
     #transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2)),
     transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
     transforms.Resize(RE_SCALED_SIZE, interpolation=INTERPOLATION),
