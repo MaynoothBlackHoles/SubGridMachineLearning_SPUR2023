@@ -72,8 +72,8 @@ for i in range(EPOCHS):
         plt.legend()
 
     plt.subplot(122)
-    plt.plot(epochs_list, dictionary["train loss"], "--", label="train", color="lightgreen")
-    plt.plot(epochs_list, dictionary["test loss"], "--", label="test", color="lightred")
+    plt.plot(epochs_list, dictionary["train loss"], "--", label="train", color="darkgreen")
+    plt.plot(epochs_list, dictionary["test loss"], "--", label="test", color="darkred")
     if epoch_num == 1:
         plt.legend()
     plt.xlabel("Epoch")
