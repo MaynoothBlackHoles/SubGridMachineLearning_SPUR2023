@@ -1,5 +1,5 @@
 """
-File which holds network architectures
+File which holds network architectures for binary classification
 """
 
 import torch

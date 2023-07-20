@@ -294,4 +294,18 @@ def classified_data_slicer(classified_data, output_lenght):
         sliced_tensor = tensor_slicer(tensor, output_lenght)
         sliced_data.append((sliced_tensor, classified_data[1][i]))
     return sliced_data
-        
+
+import torchvision.transforms as transforms
+
+def shuffle_batched_classified_data(data):
+    shuffle_data = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(degrees=5),
+    ])
+
+    batch_size = len(data[0])
+    
+    for batch_num, (x, y) in enumerate(data):
+        for i in range(batch_size):
+            x[i] = shuffle_data(x[i])
+            y[i] = shuffle_data(y[i])

@@ -1,5 +1,5 @@
 """
-File which holds network architectures
+File which holds super resolution network architectures
 """
 
 import torch
