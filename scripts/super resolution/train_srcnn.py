@@ -20,8 +20,8 @@ from src import subgridmodel as sgm
 
 # hyperparameters
 LEARNING_RATE = 1e-4
-EPOCHS = 100
-BATCH_SIZE = 128
+EPOCHS = 15
+BATCH_SIZE = 256 
 
 IMAGE_SIZE = 500
 
@@ -29,7 +29,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
 model = net.Srcnn().to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
 total_params = sum(p.numel() for p in model.parameters())
@@ -65,7 +65,7 @@ for i in range(EPOCHS):
     plt.subplot(121)
     plt.plot(epochs_list, dictionary["train PSNR"], label="train", color="green")
     plt.plot(epochs_list, dictionary["test PSNR"], label="test", color="red")
-    plt.plot(epochs_list, ones_list * 81.25, label="bicubic", color="blue")
+    plt.plot(epochs_list, ones_list * 32.97, label="bicubic", color="blue")
     plt.xlabel("Epoch")
     plt.ylabel("PSNR")
     if epoch_num == 1:
