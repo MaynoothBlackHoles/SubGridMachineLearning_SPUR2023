@@ -322,11 +322,11 @@ def classified_data_slicer(classified_data, output_lenght):
 
 def sr_data_slicer(tensor_list, output_lenght):
     """
-    Creates a new dataset which replaces tensors with a list of slices from tensor
+    Creates a new dataset which replaces a list of tensors with a list of slices from tensor each tensor
     """
     sliced_tensors = []
-    for i, x in enumerate(tensor_list):
-        sliced_x = tensor_slicer_2d(tensor_list, output_lenght)
-        sliced_tensors.extend(sliced_x)
+    for i, tensor in enumerate(tensor_list):
+        sliced_tensor = tensor_slicer_2d(tensor, output_lenght)
+        sliced_tensors.extend(sliced_tensor)
 
     return sliced_tensors
