@@ -31,8 +31,10 @@ data_downscale = transforms.Compose([
 
 convert_tensor = transforms.ToTensor()
 
+print("Loading dummy_data")
 dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", download=True, transform=transforms.ToTensor())
 
+print("")
 tensor_list = []
 for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
     img = Image.open(current_dir + f"/data/flowers-102/jpg/{image}")
@@ -50,6 +52,7 @@ downscaled = transform_tensors(tensor_list, data_downscale)
 high_res = transform_tensors(tensor_list, data_cropToTensor)
 
 split_num = int(len(tensor_list) * 0.9)
+print(len(tensor_list))
 
 training = downscaled[:split_num], high_res[:split_num] 
 validation = downscaled[split_num:], high_res[split_num:] 
