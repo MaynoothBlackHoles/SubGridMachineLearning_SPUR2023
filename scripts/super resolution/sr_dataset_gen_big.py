@@ -31,8 +31,6 @@ data_downscale = transforms.Compose([
     transforms.ToTensor()
 ])
 
-convert_tensor = transforms.ToTensor()
-
 print("[INFO] Loading dummy_data")
 dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", download=True, transform=transforms.ToTensor())
 
@@ -40,8 +38,10 @@ print("[INFO] Extracting images")
 tensor_list = []
 for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
     img = Image.open(current_dir + f"/data/flowers-102/jpg/{image}")
-    tensor = convert_tensor(img)
+    tensor = data_cropToTensor(img)
     tensor_list.append(tensor)
+
+tensor_list =  torch.stack(tensor_list)
 
 def transform_tensors(tensors, transform):
     transformed_tensors = []
