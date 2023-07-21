@@ -19,8 +19,8 @@ from src import sr_networks as net
 from src import subgridmodel as sgm
 
 # hyperparameters
-LEARNING_RATE = 1e-4
-EPOCHS = 15
+LEARNING_RATE = 1e-3
+EPOCHS = 200
 BATCH_SIZE = 256 
 
 IMAGE_SIZE = 500
