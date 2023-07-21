@@ -257,7 +257,7 @@ def star_forming_ratio(classified_dataset):
     return round(float(total_starforming / size), 2)
 
 
-def tensor_slicer(tensor, output_lenght):
+def tensor_slicer_3d(tensor, output_lenght):
     """
     Slices given tensor into smaller volumes of desired side lenght
 
@@ -285,13 +285,38 @@ def tensor_slicer(tensor, output_lenght):
     
     return slices
 
+def tensor_slicer_2d(tensor, output_lenght):
+    """
+    Slices given tensor into smaller volumes of desired side lenght
+
+     Variables
+    tensor: input tensor
+    output_lenght: desired side lenght for slices of tensor
+
+    return: list of slices of tensor
+    """
+
+    matrices, x, y = tensor.shape
+    slices = []
+
+    for i in range(x//output_lenght):
+        for j in range(y//output_lenght):
+                x_start = i * output_lenght
+                y_start = j * output_lenght
+                tensor_slice = tensor[:, x_start : x_start + output_lenght,
+                                         y_start : y_start + output_lenght]
+                tensor_slice = torch.reshape(tensor_slice, (1, matrices, output_lenght, output_lenght))
+                slices.append(tensor_slice)
+    
+    return slices
+
 def classified_data_slicer(classified_data, output_lenght):
     """
     Creates a new dataset which replaces tensors with a list of slices from tensor
     """
     sliced_data = []
     for i, tensor in enumerate(classified_data[0]):
-        sliced_tensor = tensor_slicer(tensor, output_lenght)
+        sliced_tensor = tensor_slicer_3d(tensor, output_lenght)
         sliced_data.append((sliced_tensor, classified_data[1][i]))
     return sliced_data
 
@@ -301,7 +326,7 @@ def sr_data_slicer(tensor_list, output_lenght):
     """
     sliced_tensors = []
     for i, x in enumerate(tensor_list):
-        sliced_x = tensor_slicer(tensor_list, output_lenght)
+        sliced_x = tensor_slicer_2d(tensor_list, output_lenght)
         sliced_tensors.extend(sliced_x)
 
     return sliced_tensors
