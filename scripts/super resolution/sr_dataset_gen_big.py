@@ -11,7 +11,7 @@ sys.path.append(parent_dir)
 
 from src import subgridmodel as sgm
 
-
+ORIGINAL_IMAGE_CROP = 500
 IMAGE_SLICE_SIZE = 50
 LOW_RES = int(IMAGE_SLICE_SIZE/3)
 
@@ -19,7 +19,7 @@ RE_SCALED_SIZE = IMAGE_SLICE_SIZE + 12
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 data_cropToTensor = transforms.Compose([
-	transforms.CenterCrop(IMAGE_SLICE_SIZE),
+	transforms.CenterCrop(ORIGINAL_IMAGE_CROP),
     transforms.ToTensor()
 ])
 
@@ -30,6 +30,8 @@ data_downscale = transforms.Compose([
     transforms.Resize(RE_SCALED_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
 ])
+
+
 
 print("[INFO] Loading dummy_data")
 dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", download=True, transform=transforms.ToTensor())
@@ -44,7 +46,7 @@ for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
 tensor_list =  torch.stack(tensor_list)
 print(tensor_list.shape)
 
-def transform_tensors(tensors, transform):
+def transform_tensors(tensors, transform=transforms.ToTensor()):
     transformed_tensors = []
     for i, tensor in enumerate(tensors):
         tensor = transform(tensor)
@@ -54,7 +56,7 @@ def transform_tensors(tensors, transform):
 print("[INFO] Creating datasets")
 sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
 downscaled = transform_tensors(sliced_tensor_list, data_downscale)
-high_res = transform_tensors(sliced_tensor_list, data_cropToTensor)
+high_res = transform_tensors(sliced_tensor_list)
 
 split_num = int(len(tensor_list) * 0.9)
 print(f"[INFO] Total amount of samples: {len(sliced_tensor_list)}")
