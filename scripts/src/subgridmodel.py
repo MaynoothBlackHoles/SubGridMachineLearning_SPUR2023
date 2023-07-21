@@ -271,9 +271,9 @@ def tensor_slicer(tensor, output_lenght):
     matrices, x, y, z = tensor.shape
     slices = []
 
-    for i in range(int(round(x/output_lenght))):
-        for j in range(int(round(y/output_lenght))):
-            for k in range(int(round(z/output_lenght))):
+    for i in range(x//output_lenght):
+        for j in range(y//output_lenght):
+            for k in range(z//output_lenght):
                 x_start = i * output_lenght
                 y_start = j * output_lenght
                 z_start = k * output_lenght
@@ -295,17 +295,13 @@ def classified_data_slicer(classified_data, output_lenght):
         sliced_data.append((sliced_tensor, classified_data[1][i]))
     return sliced_data
 
-import torchvision.transforms as transforms
+def sr_data_slicer(tensor_list, output_lenght):
+    """
+    Creates a new dataset which replaces tensors with a list of slices from tensor
+    """
+    sliced_tensors = []
+    for i, x in enumerate(tensor_list):
+        sliced_x = tensor_slicer(tensor_list, output_lenght)
+        sliced_tensors.extend(sliced_x)
 
-def shuffle_batched_classified_data(data):
-    shuffle_data = transforms.Compose([
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(degrees=5),
-    ])
-
-    batch_size = len(data[0])
-    
-    for batch_num, (x, y) in enumerate(data):
-        for i in range(batch_size):
-            x[i] = shuffle_data(x[i])
-            y[i] = shuffle_data(y[i])
+    return sliced_tensors
