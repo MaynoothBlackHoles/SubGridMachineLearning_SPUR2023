@@ -123,7 +123,8 @@ def test_sliced_data(dataset, model, device):
 
 def eval_PSNR(x, y):
     MSE = torch.mean(torch.square(x - y))
-    PSNR = 20*torch.log10(torch.tensor(255)) - 10*torch.log10(MSE)
+    MAX_I = torch.max(x)
+    PSNR = 20*torch.log10(torch.tensor(MAX_I)) - 10*torch.log10(MSE)
     return float(PSNR)
 
 def test_PSNR(dataset):
@@ -139,7 +140,6 @@ def test_PSNR(dataset):
 
     avg_PSNR = total_PSNR / batches
     return avg_PSNR
-
 
 def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list, loss_list):
     total_loss = 0
@@ -185,7 +185,7 @@ def sr_test_loop(dataset, model, loss_fn, device, PSNR_list, loss_list):
 		
         if (batch + 1) % 2 == 0:
             percentage = round(100 * ((batch + 1)/batches), 1)
-            print(f"Training epoch {percentage}% done", end="\r")
+            print(f"Testing epoch {percentage}% done", end="\r")
 
         (x, y) = (x.to(device), y.to(device))
 
