@@ -80,7 +80,7 @@ for i in range(EPOCHS):
     plt.ylabel("Loss")
 
     plt.savefig("plot")
-    torch.save(model.state_dict(), f"srcnn{IMAGE_SIZE}.pt")
+    torch.save(model.state_dict(), f"srcnn{IMAGE_SIZE}_slices.pt")
     
 print("[INFO] Done! :D")
 
