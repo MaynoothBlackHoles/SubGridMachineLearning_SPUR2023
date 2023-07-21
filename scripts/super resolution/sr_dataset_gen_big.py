@@ -42,6 +42,7 @@ for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
     tensor_list.append(tensor)
 
 tensor_list =  torch.stack(tensor_list)
+print(tensor_list.shape)
 
 def transform_tensors(tensors, transform):
     transformed_tensors = []
