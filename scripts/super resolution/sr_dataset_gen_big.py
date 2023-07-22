@@ -72,5 +72,5 @@ def save_data(dataset, name):
     torch.save(dataset, current_dir + f"/data/{name}.pt")
 
 print("[INFO] Saving datasets")
-save_data(training, name=f"scliced_training_{IMAGE_SLICE_SIZE}s")
-save_data(validation, name=f"scliced_validation_{IMAGE_SLICE_SIZE}s")
+save_data(training, name=f"sliced_training_{IMAGE_SLICE_SIZE}s")
+save_data(validation, name=f"sliced_validation_{IMAGE_SLICE_SIZE}s")
