@@ -41,7 +41,7 @@ loss_fn = nn.MSELoss()
 # loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
 train_data = torch.load(current_dir +  f"/data/sliced_training_{IMAGE_SLICE_SIZE}s.pt")
-test_data = torch.load(current_dir + f"/data/scliced_validation_{IMAGE_SLICE_SIZE}s.pt")
+test_data = torch.load(current_dir + f"/data/sliced_validation_{IMAGE_SLICE_SIZE}s.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
