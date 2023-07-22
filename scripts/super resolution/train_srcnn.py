@@ -62,20 +62,19 @@ for i in range(EPOCHS):
     epochs_list = [i for i in range(1, epoch_num + 1)]
     ones_list = np.ones(i + 1)
 
+    plt.figure()
     plt.subplot(121)
     plt.plot(epochs_list, dictionary["train PSNR"], label="train", color="green")
     plt.plot(epochs_list, dictionary["test PSNR"], label="test", color="red")
     plt.plot(epochs_list, ones_list * 32.97, label="bicubic", color="blue")
     plt.xlabel("Epoch")
     plt.ylabel("PSNR")
-    if epoch_num == 1:
-        plt.legend()
+    plt.legend()
 
     plt.subplot(122)
     plt.plot(epochs_list, dictionary["train loss"], "--", label="train", color="darkgreen")
     plt.plot(epochs_list, dictionary["test loss"], "--", label="test", color="darkred")
-    if epoch_num == 1:
-        plt.legend()
+    plt.legend()
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
 
