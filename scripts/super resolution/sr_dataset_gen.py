@@ -5,6 +5,7 @@ import torch
 
 import os
 current_dir = os.getcwd()
+current_dir = current_dir.replace("\\", "/")
 
 IMAGE_SIZE = 500
 LOW_RES = int(IMAGE_SIZE/3)

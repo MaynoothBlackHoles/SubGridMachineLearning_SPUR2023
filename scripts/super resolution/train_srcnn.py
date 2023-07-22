@@ -11,8 +11,12 @@ import numpy as np
 import sys
 import os
 current_dir = os.getcwd()
+current_dir = current_dir.replace("\\", "/")
+
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+parent_dir = parent_dir.replace("\\", "/")
 sys.path.append(parent_dir)
+
 
 from src import network_function as nf
 from src import sr_networks as net
@@ -21,9 +25,9 @@ from src import subgridmodel as sgm
 # hyperparameters
 LEARNING_RATE = 1e-3
 EPOCHS = 30
-BATCH_SIZE = 256 
+BATCH_SIZE = 256
 
-IMAGE_SIZE = 50
+IMAGE_SLICE_SIZE = 50
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -32,13 +36,12 @@ model = net.Srcnn().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
-total_params = sum(p.numel() for p in model.parameters())
-print(f"Number of parameters: {total_params}")
+#total_params = sum(p.numel() for p in model.parameters())
 
 # loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/training_{IMAGE_SIZE}s.pt")
-test_data = torch.load(current_dir + f"/data/validation_{IMAGE_SIZE}s.pt")
+train_data = torch.load(current_dir +  f"/data/sliced_training_{IMAGE_SLICE_SIZE}s.pt")
+test_data = torch.load(current_dir + f"/data/scliced_validation_{IMAGE_SLICE_SIZE}s.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
@@ -63,22 +66,23 @@ for i in range(EPOCHS):
     ones_list = np.ones(i + 1)
 
     plt.clf()
-    fig, (ax0, ax1) = plt.subplots(2, 1)
-    ax0.plot(epochs_list, dictionary["train PSNR"], label="train", color="green")
-    ax0.plot(epochs_list, dictionary["test PSNR"], label="test", color="red")
-    ax0.plot(epochs_list, ones_list * 32.97, label="bicubic", color="blue")
-    ax0.xlabel("Epoch")
-    ax0.ylabel("PSNR")
-    ax0.legend()
+    plt.subplot(211)
+    plt.plot(epochs_list, dictionary["train PSNR"], label="train", color="green")
+    plt.plot(epochs_list, dictionary["test PSNR"], label="test", color="red")
+    plt.plot(epochs_list, ones_list * 32.97, label="bicubic", color="blue")
+    plt.ylabel("PSNR")
+    plt.legend()
 
-    ax1.plot(epochs_list, dictionary["train loss"], "--", label="train", color="green")
-    ax1.plot(epochs_list, dictionary["test loss"], "--", label="test", color="red")
-    ax1.legend()
-    ax1.xlabel("Epoch")
-    ax1.ylabel("Loss")
+    plt.subplot(212)
+    plt.plot(epochs_list, dictionary["train loss"], "--", label="train", color="darkgreen")
+    plt.plot(epochs_list, dictionary["test loss"], "--", label="test", color="darkred")
+    plt.legend()
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
 
-    fig.savefig("plot")
-    torch.save(model.state_dict(), f"srcnn{IMAGE_SIZE}_slices.pt")
+    plt.savefig("plot")
+
+    torch.save(model.state_dict(), f"srcnn{IMAGE_SLICE_SIZE}_slices.pt")
     
 print("[INFO] Done! :D")
 plt.show()

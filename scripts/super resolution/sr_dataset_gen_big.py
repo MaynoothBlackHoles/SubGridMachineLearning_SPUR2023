@@ -7,6 +7,7 @@ import sys
 import os
 current_dir = os.getcwd()
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+parent_dir = parent_dir.replace("\\", "/")
 sys.path.append(parent_dir)
 
 from src import subgridmodel as sgm
@@ -31,14 +32,17 @@ data_downscale = transforms.Compose([
     transforms.ToTensor()
 ])
 
-
-
 print("[INFO] Loading dummy_data")
 dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", download=True, transform=transforms.ToTensor())
 
 print("[INFO] Extracting images")
 tensor_list = []
+#MAX_LIST_SIZE = 50
+#tick = 0
 for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
+    #tick += 1
+    #if tick == MAX_LIST_SIZE:
+    #    break
     img = Image.open(current_dir + f"/data/flowers-102/jpg/{image}")
     tensor = data_cropToTensor(img)
     tensor_list.append(tensor)
@@ -68,5 +72,5 @@ def save_data(dataset, name):
     torch.save(dataset, current_dir + f"/data/{name}.pt")
 
 print("[INFO] Saving datasets")
-save_data(training, name=f"training_{IMAGE_SLICE_SIZE}s")
-save_data(validation, name=f"validation_{IMAGE_SLICE_SIZE}s")
+save_data(training, name=f"scliced_training_{IMAGE_SLICE_SIZE}s")
+save_data(validation, name=f"scliced_validation_{IMAGE_SLICE_SIZE}s")

@@ -28,5 +28,4 @@ train_data = torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Prog
 data_PSNR = test_PSNR(train_data)
 
 print("-----------------------------")
-print(data_PSNR) # 81.25043287090227 #32.97324611813414
-
+print(data_PSNR) #32.97324611813414
