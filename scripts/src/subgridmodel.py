@@ -305,7 +305,7 @@ def tensor_slicer_2d(tensor, output_lenght):
                 y_start = j * output_lenght
                 tensor_slice = tensor[:, x_start : x_start + output_lenght,
                                          y_start : y_start + output_lenght]
-                tensor_slice = torch.reshape(tensor_slice, (1, matrices, output_lenght, output_lenght))
+                tensor_slice = torch.reshape(tensor_slice, (matrices, output_lenght, output_lenght))
                 slices.append(tensor_slice)
     
     return slices
