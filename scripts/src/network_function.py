@@ -149,9 +149,8 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list, loss_li
     
     for batch, (x, y) in enumerate(dataset):
 		
-        if (batch + 1) % 1 == 0:
-            percentage = round(100 * ((batch + 1)/batches), 1)
-            print(f"Training epoch {percentage}% done", end="\r")
+        percentage = round(100 * ((batch + 1)/batches), 1)
+        print(f"Training: {percentage}%", end="\r")
 
         (x, y) = (x.to(device), y.to(device))
 
@@ -183,9 +182,8 @@ def sr_test_loop(dataset, model, loss_fn, device, PSNR_list, loss_list):
     
     for batch, (x, y) in enumerate(dataset):
 		
-        if (batch + 1) % 2 == 0:
-            percentage = round(100 * ((batch + 1)/batches), 1)
-            print(f"Testing epoch {percentage}% done", end="\r")
+        percentage = round(100 * ((batch + 1)/batches), 1)
+        print(f"Testing: {percentage}%", end="\r")
 
         (x, y) = (x.to(device), y.to(device))
 
