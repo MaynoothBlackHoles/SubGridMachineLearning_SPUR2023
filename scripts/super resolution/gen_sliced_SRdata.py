@@ -14,7 +14,7 @@ sys.path.append(parent_dir)
 from src import subgridmodel as sgm
 
 #ORIGINAL_IMAGE_CROP = 500
-IMAGE_SLICE_SIZE = input("Image slice size: ")
+IMAGE_SLICE_SIZE = int(input("Image slice size: "))
 LOW_RES = IMAGE_SLICE_SIZE // 2
 
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC

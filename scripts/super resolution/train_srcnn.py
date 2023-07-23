@@ -27,7 +27,7 @@ LEARNING_RATE = 1e-3
 EPOCHS = 30
 BATCH_SIZE = 256
 
-IMAGE_SLICE_SIZE = input("Image slice size: ")
+IMAGE_SLICE_SIZE = int(input("Image slice size: "))
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
