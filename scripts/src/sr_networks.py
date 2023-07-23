@@ -10,13 +10,13 @@ class Srcnn(torch.nn.Module):
 		super(Srcnn, self).__init__()
 
 		self.stack = nn.Sequential(
-			nn.Conv2d(in_channels=3, out_channels=64, kernel_size=f_1, stride=1),
+			nn.Conv2d(in_channels=3, out_channels=64, kernel_size=f_1, padding=f_1//2),
 			nn.ReLU(),
 
-			nn.Conv2d(in_channels=64, out_channels=32, kernel_size=f_2, stride=1),
+			nn.Conv2d(in_channels=64, out_channels=32, kernel_size=f_2, padding=f_2//2 ),
 			nn.ReLU(),
 
-			nn.Conv2d(in_channels=32, out_channels=3, kernel_size=f_3, stride=1)
+			nn.Conv2d(in_channels=32, out_channels=3, kernel_size=f_3, padding=f_3//2)
 			)
 		
 	def forward(self, x):
