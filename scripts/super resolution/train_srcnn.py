@@ -24,8 +24,8 @@ from src import subgridmodel as sgm
 
 # hyperparameters
 LEARNING_RATE = 1e-3
-EPOCHS = 30
-BATCH_SIZE = 256
+EPOCHS = 10
+BATCH_SIZE = 64
 
 IMAGE_SLICE_SIZE = 50
 
