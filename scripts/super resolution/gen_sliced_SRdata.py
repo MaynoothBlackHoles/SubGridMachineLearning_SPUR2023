@@ -38,12 +38,12 @@ dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", downloa
 
 print("[INFO] Extracting images")
 tensor_list = []
-MAX_LIST_SIZE = 300
-tick = 0
+#MAX_LIST_SIZE = 300
+#tick = 0
 for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
-    tick += 1
-    if tick == MAX_LIST_SIZE:
-        break
+    #tick += 1
+    #if tick == MAX_LIST_SIZE:
+    #    break
     img = Image.open(current_dir + f"/data/flowers-102/jpg/{image}")
     tensor = data_cropToTensor(img)
     tensor_list.append(tensor)
