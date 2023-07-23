@@ -13,23 +13,22 @@ sys.path.append(parent_dir)
 
 from src import subgridmodel as sgm
 
-ORIGINAL_IMAGE_CROP = 500
-IMAGE_SLICE_SIZE = 50
-LOW_RES = int(IMAGE_SLICE_SIZE/3)
+#ORIGINAL_IMAGE_CROP = 500
+IMAGE_SLICE_SIZE = input("Image slice size: ")
+LOW_RES = IMAGE_SLICE_SIZE // 2
 
-RE_SCALED_SIZE = IMAGE_SLICE_SIZE #+ 12
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 data_cropToTensor = transforms.Compose([
-	transforms.CenterCrop(ORIGINAL_IMAGE_CROP),
+	#transforms.CenterCrop(ORIGINAL_IMAGE_CROP),
     transforms.ToTensor()
 ])
 
 data_downscale = transforms.Compose([
-	transforms.CenterCrop(IMAGE_SLICE_SIZE),
+	#transforms.CenterCrop(IMAGE_SLICE_SIZE),
     #transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2)),
     transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
-    transforms.Resize(RE_SCALED_SIZE, interpolation=INTERPOLATION),
+    transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
 ])
 
