@@ -47,9 +47,6 @@ for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
     tensor = data_cropToTensor(img)
     tensor_list.append(tensor)
 
-tensor_list =  torch.stack(tensor_list)
-print(tensor_list.shape)
-
 def transform_tensors(tensors, transform=transforms.ToTensor()):
     transformed_tensors = []
     for i, tensor in enumerate(tensors):
@@ -61,7 +58,9 @@ print("[INFO] Creating datasets")
 sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
 random.shuffle(sliced_tensor_list)
 downscaled = transform_tensors(sliced_tensor_list, data_downscale)
+downscaled = torch.stack(downscaled)
 high_res = transform_tensors(sliced_tensor_list)
+high_res = torch.stack(high_res)
 
 
 split_num = int(len(sliced_tensor_list) * 0.9)
