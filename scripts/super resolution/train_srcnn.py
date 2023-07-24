@@ -17,7 +17,6 @@ parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 parent_dir = parent_dir.replace("\\", "/")
 sys.path.append(parent_dir)
 
-
 from src import network_function as nf
 from src import sr_networks as net
 from src import subgridmodel as sgm
@@ -38,10 +37,9 @@ loss_fn = nn.MSELoss()
 
 #total_params = sum(p.numel() for p in model.parameters())
 
-# loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/sliced_training_{IMAGE_SLICE_SIZE}s.pt")
-test_data = torch.load(current_dir + f"/data/sliced_validation_{IMAGE_SLICE_SIZE}s.pt")
+train_data = torch.load(current_dir +  f"/data/sliced_blured_training_{IMAGE_SLICE_SIZE}s.pt")
+test_data = torch.load(current_dir + f"/data/sliced_blured_validation_{IMAGE_SLICE_SIZE}s.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
@@ -82,7 +80,7 @@ for i in range(EPOCHS):
 
     plt.savefig("plot")
 
-    torch.save(model.state_dict(), f"srcnn{IMAGE_SLICE_SIZE}_slices.pt")
+    torch.save(model.state_dict(), f"srcnn{IMAGE_SLICE_SIZE}_slices_blured.pt")
     
 print("[INFO] Done! :D")
 plt.show()

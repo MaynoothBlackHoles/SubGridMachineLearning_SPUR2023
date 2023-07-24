@@ -1,6 +1,11 @@
+"""
+Script to test avarage PSNR of a chosen dataset
+"""
+
 import torch
 
 IMAGE_SIZE = 500
+
 
 def eval_PSNR(x, y):
     MSE = torch.mean(torch.square(x - y))
@@ -24,7 +29,10 @@ def test_PSNR(dataset):
     avg_PSNR = total_PSNR / size
     return avg_PSNR
 
+# load your dataset
 train_data = torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/super resolution/data/smalltraining_{IMAGE_SIZE}s.pt")
+
+# testing on loaded dataset
 data_PSNR = test_PSNR(train_data)
 
 print("-----------------------------")

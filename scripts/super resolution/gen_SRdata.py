@@ -8,9 +8,9 @@ current_dir = os.getcwd()
 current_dir = current_dir.replace("\\", "/")
 
 IMAGE_SIZE = 500
-LOW_RES = int(IMAGE_SIZE/3)
+LOW_RES = IMAGE_SIZE // 3
 
-RE_SCALED_SIZE = IMAGE_SIZE #+ 12
+RE_SCALED_SIZE = IMAGE_SIZE
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 data_transform = transforms.Compose([
@@ -30,10 +30,6 @@ downscaled_trainData = torchvision.datasets.Flowers102(root="data", split="train
 trainDataLoader = DataLoader(trainData, )
 downscaled_trainDataLoader = DataLoader(downscaled_trainData)
 
-"""valData = torchvision.datasets.Flowers102(root="data", split="test", download=True, transform=data_transform)
-downscaled_valData = torchvision.datasets.Flowers102(root="data", split="val", download=True, transform=data_downscale)
-valDataLoader = DataLoader(valData)
-downscaled_valDataLoader = DataLoader(downscaled_valData)"""
 
 def extract_images(dataLoader, img_size):
     tensors = []
@@ -44,8 +40,6 @@ def extract_images(dataLoader, img_size):
 
 tensor_trainData = extract_images(trainDataLoader, IMAGE_SIZE)
 tensor_downscaled_trainData = extract_images(downscaled_trainDataLoader, RE_SCALED_SIZE)
-#tensor_valData = extract_images(valDataLoader, IMAGE_SIZE)
-#tensor_downscaled_ValData = extract_images(downscaled_trainData, RE_SCALED_SIZE)
 
 def save_data(dataset, name):
     torch.save(dataset, current_dir + f"/data/{name}.pt")

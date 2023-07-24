@@ -13,20 +13,18 @@ sys.path.append(parent_dir)
 
 from src import subgridmodel as sgm
 
-#ORIGINAL_IMAGE_CROP = 500
+#IMAGE_SIZE = 500
+
 IMAGE_SLICE_SIZE = int(input("Image slice size: "))
 LOW_RES = IMAGE_SLICE_SIZE // 2
+EXTRACT_SIZE = 10
 
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
-data_cropToTensor = transforms.Compose([
-	#transforms.CenterCrop(ORIGINAL_IMAGE_CROP),
-    transforms.ToTensor()
-])
+data_ToTensor = transforms.ToTensor()
 
 data_downscale = transforms.Compose([
-	#transforms.CenterCrop(IMAGE_SLICE_SIZE),
-    #transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2)),
+    transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2)),
     transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
     transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
@@ -35,17 +33,19 @@ data_downscale = transforms.Compose([
 print("[INFO] Loading dummy_data")
 dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", download=True, transform=transforms.ToTensor())
 
-print("[INFO] Extracting images")
-tensor_list = []
-#MAX_LIST_SIZE = 300
-#tick = 0
-for image in os.listdir(current_dir + "/data/flowers-102/jpg"):
-    #tick += 1
-    #if tick == MAX_LIST_SIZE:
-    #    break
-    img = Image.open(current_dir + f"/data/flowers-102/jpg/{image}")
-    tensor = data_cropToTensor(img)
-    tensor_list.append(tensor)
+def extract_tensors(folder_location, max_size=-1):
+    tensor_list = []
+    tick = 0
+    for image in os.listdir(folder_location):
+        img = Image.open(folder_location + f"/{image}")
+        tensor = data_ToTensor(img)
+        tensor_list.append(tensor)
+
+        tick += 1
+        if tick == max_size:
+            break
+
+    return tensor_list
 
 def transform_tensors(tensors, transform=transforms.ToTensor()):
     transformed_tensors = []
@@ -54,6 +54,9 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
         transformed_tensors.append(tensor)
     return transformed_tensors
 
+print("[INFO] Extracting images")
+tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=EXTRACT_SIZE)
+
 print("[INFO] Creating datasets")
 sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
 random.shuffle(sliced_tensor_list)
@@ -61,7 +64,6 @@ downscaled = transform_tensors(sliced_tensor_list, data_downscale)
 downscaled = torch.stack(downscaled)
 high_res = transform_tensors(sliced_tensor_list)
 high_res = torch.stack(high_res)
-
 
 split_num = int(len(sliced_tensor_list) * 0.9)
 print(f"[INFO] Total amount of samples: {len(sliced_tensor_list)}")
@@ -73,7 +75,7 @@ def save_data(dataset, name):
     torch.save(dataset, current_dir + f"/data/{name}.pt")
 
 print("[INFO] Saving datasets")
-save_data(training, name=f"sliced_training_{IMAGE_SLICE_SIZE}s")
-save_data(validation, name=f"sliced_validation_{IMAGE_SLICE_SIZE}s")
+save_data(training, name=f"sliced_blured_training_{IMAGE_SLICE_SIZE}s")
+save_data(validation, name=f"sliced_blured_validation_{IMAGE_SLICE_SIZE}s")
 
 print("[INFO] Done!")
