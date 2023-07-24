@@ -24,7 +24,7 @@ INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 data_ToTensor = transforms.ToTensor()
 
 data_downscale = transforms.Compose([
-    transforms.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 2)),
+    transforms.GaussianBlur(kernel_size=(5, 5)),
     transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
     transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
@@ -55,7 +55,7 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
     return transformed_tensors
 
 print("[INFO] Extracting images")
-tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=EXTRACT_SIZE)
+tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg")
 
 print("[INFO] Creating datasets")
 sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
