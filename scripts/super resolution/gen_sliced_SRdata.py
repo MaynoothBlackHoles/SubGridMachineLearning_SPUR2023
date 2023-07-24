@@ -24,7 +24,7 @@ INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 data_ToTensor = transforms.ToTensor()
 
 data_downscale = transforms.Compose([
-    transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2)),
+    transforms.GaussianBlur(kernel_size=[5], sigma=(0.1, 2)),
     transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
     transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
