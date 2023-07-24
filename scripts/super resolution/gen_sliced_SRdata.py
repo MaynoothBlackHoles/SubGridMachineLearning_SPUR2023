@@ -15,7 +15,7 @@ from src import subgridmodel as sgm
 
 #IMAGE_SIZE = 500
 
-IMAGE_SLICE_SIZE = int(input("Image slice size: "))
+IMAGE_SLICE_SIZE = 33
 LOW_RES = IMAGE_SLICE_SIZE // 2
 EXTRACT_SIZE = 10
 
