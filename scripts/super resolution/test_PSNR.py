@@ -15,7 +15,8 @@ parent_dir = parent_dir.replace("\\", "/")
 from src import network_function as nf
 
 # load your dataset
-train_data = torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/super resolution/data/smalltraining_500s.pt")
+dataset_name = input("Dataset name: ")
+train_data = torch.load(current_dir + f"/data/.pt")
 
 # testing on loaded dataset
 data_PSNR = nf.test_PSNR(train_data)
