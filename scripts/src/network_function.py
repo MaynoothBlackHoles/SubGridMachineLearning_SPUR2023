@@ -5,7 +5,7 @@ Functions for network training and testing
 import torch
 
 
-def train_loop(dataset, model, loss_fn, device, optimizer, correct_list, loss_list):
+def train_loop(dataset, model, loss_fn, device, optimizer, correct_list=[], loss_list=[]):
     """
     Trains network by running through given dataset
 
@@ -51,7 +51,7 @@ def train_loop(dataset, model, loss_fn, device, optimizer, correct_list, loss_li
     correct_list.append(correct)
     loss_list.append(avg_loss)
 	
-def test_loop(dataset, model, loss_fn, device, correct_list, loss_list):
+def test_loop(dataset, model, loss_fn, device, correct_list=[], loss_list=[]):
     """
     Test network by running through given dataset
 
@@ -122,12 +122,21 @@ def test_sliced_data(dataset, model, device):
     print(f"Test Error: \n Accuracy: {(correct):.2f} \n")
 
 def eval_PSNR(x, y):
+    """
+    Function to evaluate the PSNR of two tensors; x, y
+    """
     MSE = torch.mean(torch.square(x - y))
     MAX_I = torch.max(x)
     PSNR = 20*torch.log10(torch.tensor(MAX_I)) - 10*torch.log10(MSE)
     return float(PSNR)
 
 def test_PSNR(dataset):
+    """
+    Function to test the PSNR of a dataset which has pairs of tensors one of which has been transformed
+
+    return: average PSNR of dataset
+    """
+
     total_PSNR = 0
         
     batches = (len(dataset))
@@ -141,7 +150,20 @@ def test_PSNR(dataset):
     avg_PSNR = total_PSNR / batches
     return avg_PSNR
 
-def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list, loss_list):
+def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss_list=[]):
+    """
+    Trains a super resolution network by running through given dataset
+
+     Variables
+    dataset: batched classified dataset  
+    model: network architecture
+    loss_fn: loss function
+    device: cpu or gpu
+    opitimiser: optimising function
+    PSNR_list: empty list in which average PSNR is stored per epoch
+    loss_list: empty list in which average loss is stored per epoch
+    """
+
     total_loss = 0
     total_PSNR = 0
         
@@ -168,11 +190,24 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list, loss_li
     avg_PSNR = total_PSNR / batches
     avg_loss = total_loss / batches
 
-    print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.3f} \n")
+    print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
     PSNR_list.append(avg_PSNR)
 
-def sr_test_loop(dataset, model, loss_fn, device, PSNR_list, loss_list):
+def sr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
+    """
+    Test a super resolution network by running through given dataset
+
+     Variables
+    dataset: batched classified dataset  
+    model: network architecture
+    loss_fn: loss function
+    device: cpu or gpu
+    opitimiser: optimising function
+    PSNR_list: empty list in which average PSNR is stored per epoch
+    loss_list: empty list in which average loss is stored per epoch
+    """
+
     model.eval()
 
     total_loss = 0
@@ -197,6 +232,6 @@ def sr_test_loop(dataset, model, loss_fn, device, PSNR_list, loss_list):
     avg_PSNR = total_PSNR / batches
     avg_loss = total_loss / batches
 
-    print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.3f} \n")
+    print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
     PSNR_list.append(avg_PSNR)

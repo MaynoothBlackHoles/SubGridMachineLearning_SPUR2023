@@ -4,6 +4,7 @@ Script to hold data generating, classifying, pre processing and testing function
 
 import torch
 import random
+import torchvision.transforms.v2 as transforms
 
 
 def check_voxel(tensor, x, y, z):
@@ -72,6 +73,9 @@ def check_starForming(tensor):
 def gen_uniform_tensor(box_lenght):
     """
     Generates a tensor with uniformly disrtibued properties
+
+     Variables
+    box_lenght: side lenght of the generated cube
     """
     cool_factor = 1 / box_lenght 
     ones_tensor = torch.ones(box_lenght, box_lenght, box_lenght)
@@ -153,6 +157,13 @@ def classify_dataset(dataset):
     return torch.tensor(classification)
 
 def batch_classified_data(classified_dataset, batch_size):
+    """
+    Takes in a classified dataset and makes a new list which contains batches of data.
+
+     Variables
+    classified_datset: a classified datset which is a list with two entries. The first entry a list of tensors for the network to be trained on. The second entry a list of classifications corresponding in entry number to the previous list of tensors.
+    batch_size: desired size of batches
+    """
     batched_list = []
     data = []
     classification = []
@@ -247,7 +258,12 @@ def gen_fast_classified_data(size, box_lenght, max_stars=5, min_stars=1):
 
 def star_forming_ratio(classified_dataset):
     """
-    Calculates ratio of star forming tensor to non star forming tensors in a classified dataset
+    Calculates and returns ratio of star forming tensor to non star forming tensors in a classified dataset
+
+     Variables
+    classified_datset: a classified datset which is a list with two entries. 
+    The first entry a list of tensors for the network to be trained on. The second 
+    entry a list of classifications corresponding in entry number to the previous list of tensors.
     """
     calssification = classified_dataset[1]
     size = len(calssification)
@@ -312,7 +328,11 @@ def tensor_slicer_2d(tensor, output_lenght):
 
 def classified_data_slicer(classified_data, output_lenght):
     """
-    Creates a new dataset which replaces tensors with a list of slices from tensor
+    Creates a new dataset which replaces tensors with a list of slices from tensor in the input dataset. The slices are cubes.
+
+     Variables
+    classified_data: the input in which we will replace tensors with a list of slices from the tensor
+    output_lenght: side lenght of the slices
     """
     sliced_data = []
     for i, tensor in enumerate(classified_data[0]):
@@ -322,7 +342,11 @@ def classified_data_slicer(classified_data, output_lenght):
 
 def sr_data_slicer(tensor_list, output_lenght):
     """
-    Creates a new dataset which replaces a list of tensors with a list of slices from tensor each tensor
+    Creates a new dataset which takes in a list of tensors with a list of slices from each tensor
+
+     Variables
+    tensor_list: list of tensors to be sliced
+    output_length: lenght of the sides of the slices
     """
     sliced_tensors = []
     for i, tensor in enumerate(tensor_list):
@@ -330,3 +354,10 @@ def sr_data_slicer(tensor_list, output_lenght):
         sliced_tensors.extend(sliced_tensor)
 
     return sliced_tensors
+
+def transform_tensors(tensors, transform=transforms.ToTensor()):
+    transformed_tensors = []
+    for i, tensor in enumerate(tensors):
+        tensor = transform(tensor)
+        transformed_tensors.append(tensor)
+    return transformed_tensors
