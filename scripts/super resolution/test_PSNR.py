@@ -11,6 +11,7 @@ current_dir = current_dir.replace("\\", "/") # this line is here for windows, if
 
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 parent_dir = parent_dir.replace("\\", "/") 
+sys.path.append(parent_dir)
 
 from src import network_function as nf
 
