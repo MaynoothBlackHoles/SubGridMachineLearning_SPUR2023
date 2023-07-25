@@ -24,13 +24,14 @@ from src import subgridmodel as sgm
 # hyperparameters
 LEARNING_RATE = 1e-3
 EPOCHS = 20
-BATCH_SIZE = 512
+BATCH_SIZE = 256
 
 IMAGE_SLICE_SIZE = 33
 SCALE_FACTOR = 4
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 
 # loadng network architecture, choosing optimiser and loss function
 model = net.Srcnn().to(device)

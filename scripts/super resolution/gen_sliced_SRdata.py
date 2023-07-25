@@ -56,7 +56,7 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
 
 # taking out images from the datset and converting them into torch tensors
 print("[INFO] Extracting images")
-tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg")
+tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=500)
 
 # saving and sorting datasets
 print("[INFO] Creating datasets")
