@@ -1,42 +1,43 @@
 """
-
+Script for testing trained network on chosen dataset
 """
 
 import torch
 from torch import nn
 import matplotlib.pyplot as plt
 import time
+
 import sys
 import os
 current_dir = os.getcwd()
-sys.path.append(current_dir)
+current_dir = current_dir.replace("\\", "/")
+
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+parent_dir = parent_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
+sys.path.append(parent_dir)
+
 from src import network_function as nf
 from src import sr_networks as net
 from src import subgridmodel as sgm
-
-BATCH_SIZE = 32
-
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
 model = net.Srcnn().to(device)
-model.load_state_dict(torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/super resolution/data/srcnn.pt"))
+model.load_state_dict(torch.load(current_dir + f"/network weights/srcnn.pt"))
 loss_fn = nn.MSELoss()
 
+# loading and preparing datasets
 print("[INFO] Loading datasets")
-test_data = torch.load(f"C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/super resolution/data/validation.pt")
+test_data = torch.load(current_dir + f"/data/validation.pt")
 print("[INFO] Batching Data")
-test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
+test_data = sgm.batch_classified_data(test_data, batch_size=32)
 
-dictionary = {"test PSNR": [], "test loss": []}
-
+# running test data throgh newtork and evaluating metrics (PSNR) and loss
 print("[INFO] Testing Network")
 time_start = time.time()
-nf.sr_test_loop(test_data, model, loss_fn, device, dictionary["test PSNR"], dictionary["test loss"])
+nf.sr_test_loop(test_data, model, loss_fn, device)
 time_end = time.time()
 print(f"time taken for test: {round((time_end - time_start)/60, 2)} mins \n")
 
-
-# saving network weights 
 print("[INFO] Done! :D")

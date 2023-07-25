@@ -14,7 +14,7 @@ current_dir = os.getcwd()
 current_dir = current_dir.replace("\\", "/")
 
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/")
+parent_dir = parent_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
 sys.path.append(parent_dir)
 
 from src import network_function as nf
@@ -27,7 +27,9 @@ EPOCHS = 30
 BATCH_SIZE = 256
 
 IMAGE_SLICE_SIZE = 33
+SCALE_FACTOR = 4
 
+# looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
@@ -35,8 +37,7 @@ model = net.Srcnn().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
-#total_params = sum(p.numel() for p in model.parameters())
-
+# establishing dataset
 print("[INFO] Loading datasets")
 train_data = torch.load(current_dir +  f"/data/sliced_blured_training_{IMAGE_SLICE_SIZE}s.pt")
 test_data = torch.load(current_dir + f"/data/sliced_blured_validation_{IMAGE_SLICE_SIZE}s.pt")
@@ -44,6 +45,7 @@ print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
 
+# dictionary to store values
 dictionary = {"train PSNR": [], "train loss": [], "test PSNR": [], "test loss": []}
 
 print("[INFO] Training Network")
@@ -53,6 +55,7 @@ for i in range(EPOCHS):
     print(f"[INFO] Epoch {i + 1} ---------------------------")
     time_start = time.time()
 
+    # training, testing and evaluating chosen metric (PSNR) and loss
     nf.sr_train_loop(train_data, model, loss_fn, device, optimizer, dictionary["train PSNR"], dictionary["train loss"])
     nf.sr_test_loop(test_data, model, loss_fn, device, dictionary["test PSNR"], dictionary["test loss"])
 
@@ -80,7 +83,8 @@ for i in range(EPOCHS):
 
     plt.savefig("plot")
 
-    torch.save(model.state_dict(), f"srcnn{IMAGE_SLICE_SIZE}_slices_blured.pt")
+    # saving model network weights each epoch
+    torch.save(model.state_dict(), f"srcnn_{IMAGE_SLICE_SIZE}ss_gb_sf{SCALE_FACTOR}.pt")
     
 print("[INFO] Done! :D")
 plt.show()

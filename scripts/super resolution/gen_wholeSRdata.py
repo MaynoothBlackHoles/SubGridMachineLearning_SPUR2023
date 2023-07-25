@@ -14,9 +14,10 @@ sys.path.append(parent_dir)
 from src import subgridmodel as sgm
 
 # parameters
-IMAGE_SLICE_SIZE = 33
-SCALE_FACTOR = 4
-LOW_RES = IMAGE_SLICE_SIZE // SCALE_FACTOR
+IMAGE_SIZE = 500
+SCALE_FACTOR = 2
+LOW_RES = IMAGE_SIZE // SCALE_FACTOR
+EXTRACT_SIZE = 100
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 # data transforms
@@ -24,7 +25,7 @@ data_ToTensor = transforms.ToTensor()
 data_downscale = transforms.Compose([
     transforms.GaussianBlur(kernel_size=(5, 5)),
     transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
-    transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
+    transforms.Resize(IMAGE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
 ])
 
@@ -56,28 +57,24 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
 
 # taking out images from the datset and converting them into torch tensors
 print("[INFO] Extracting images")
-tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg")
+tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=EXTRACT_SIZE)
 
 # saving and sorting datasets
 print("[INFO] Creating datasets")
-sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
-random.shuffle(sliced_tensor_list)
-print(f"[INFO] Total amount of samples: {len(sliced_tensor_list)}")
-downscaled = transform_tensors(sliced_tensor_list, data_downscale)
+print(f"[INFO] Total amount of samples: {len(tensor_list)}")
+downscaled = transform_tensors(tensor_list, data_downscale)
 downscaled = torch.stack(downscaled)
-high_res = transform_tensors(sliced_tensor_list)
+high_res = transform_tensors(tensor_list)
 high_res = torch.stack(high_res)
 
-split_num = int(len(sliced_tensor_list) * 0.9)
-training = (downscaled[:split_num], high_res[:split_num])
-validation = (downscaled[split_num:], high_res[split_num:])
+split_num = int(len(tensor_list) * 0.9)
+data = (downscaled, high_res)
 
 def save_data(dataset, name):
     torch.save(dataset, current_dir + f"/data/{name}.pt")
 
 # saving data
 print("[INFO] Saving datasets")
-save_data(training, name=f"sliced_training_{IMAGE_SLICE_SIZE}s")
-save_data(validation, name=f"sliced_validation_{IMAGE_SLICE_SIZE}s")
+save_data(data, name=f"sample_{IMAGE_SIZE}s")
 
 print("[INFO] Done!")
