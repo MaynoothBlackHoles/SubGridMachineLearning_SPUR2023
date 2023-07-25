@@ -77,7 +77,7 @@ def save_data(dataset, name):
 
 # saving data
 print("[INFO] Saving datasets")
-save_data(training, name=f"sliced_blured_training_{IMAGE_SLICE_SIZE}s")
-save_data(validation, name=f"sliced_blured_validation_{IMAGE_SLICE_SIZE}s")
+save_data(training, name=f"sf2_sliced_blured_training_{IMAGE_SLICE_SIZE}s")
+save_data(validation, name=f"sf2_sliced_blured_validation_{IMAGE_SLICE_SIZE}s")
 
 print("[INFO] Done!")
