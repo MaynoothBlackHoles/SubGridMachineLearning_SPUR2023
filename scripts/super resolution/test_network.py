@@ -4,7 +4,6 @@ Script for testing trained network on chosen dataset
 
 import torch
 from torch import nn
-import matplotlib.pyplot as plt
 import time
 
 import sys

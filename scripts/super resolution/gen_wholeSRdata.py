@@ -1,3 +1,7 @@
+"""
+This script is for generating a sample dataset which is to be used to test the network visually, with the test_image.py script
+"""
+
 import torchvision.transforms.v2 as transforms
 import torchvision
 import torch
@@ -7,11 +11,11 @@ import random
 import sys
 import os
 current_dir = os.getcwd()
-parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/")
-sys.path.append(parent_dir)
+current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
 
-from src import subgridmodel as sgm
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+parent_dir = parent_dir.replace("\\", "/") 
+sys.path.append(parent_dir)
 
 # parameters
 IMAGE_SIZE = 500
@@ -62,12 +66,10 @@ tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/
 # saving and sorting datasets
 print("[INFO] Creating datasets")
 print(f"[INFO] Total amount of samples: {len(tensor_list)}")
+random.shuffle(tensor_list)
 downscaled = transform_tensors(tensor_list, data_downscale)
-downscaled = torch.stack(downscaled)
 high_res = transform_tensors(tensor_list)
-high_res = torch.stack(high_res)
 
-split_num = int(len(tensor_list) * 0.9)
 data = (downscaled, high_res)
 
 def save_data(dataset, name):

@@ -9,10 +9,10 @@ import torchvision
 import sys
 import os
 current_dir = os.getcwd()
-current_dir = current_dir.replace("\\", "/")
+current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
 
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
+parent_dir = parent_dir.replace("\\", "/") 
 sys.path.append(parent_dir)
 
 from src import sr_networks as net
@@ -22,7 +22,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # pick names of weights and dataset
 weights_name = "srcnn33_slices.pt"
-dataset_name = "training_500s.pt"
+dataset_name = "sample_500s.pt"
 
 # loading network architecture and saved weights
 print("[INFO] Loading network")
@@ -34,7 +34,7 @@ print("[INFO] Loading datasets")
 test_data = torch.load(current_dir + f"/data/{dataset_name}")
 
 # position of image in dataset
-sample_num = 84
+sample_num = 90
 
 # extracting tensors
 low_res_tensor = test_data[0][sample_num]

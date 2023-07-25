@@ -11,10 +11,10 @@ import numpy as np
 import sys
 import os
 current_dir = os.getcwd()
-current_dir = current_dir.replace("\\", "/")
+current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
 
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
+parent_dir = parent_dir.replace("\\", "/")
 sys.path.append(parent_dir)
 
 from src import network_function as nf
@@ -23,8 +23,8 @@ from src import subgridmodel as sgm
 
 # hyperparameters
 LEARNING_RATE = 1e-3
-EPOCHS = 30
-BATCH_SIZE = 256
+EPOCHS = 20
+BATCH_SIZE = 512
 
 IMAGE_SLICE_SIZE = 33
 SCALE_FACTOR = 4
