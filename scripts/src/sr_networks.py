@@ -23,10 +23,10 @@ class Srcnn(torch.nn.Module):
 		return self.stack(x)
 	
 class VDsrcnn(torch.nn.Module):
-	def __init__(self, kernel=3, distance=6):
+	def __init__(self, kernel=3, depth=6):
 		super(VDsrcnn, self).__init__()
 
-		self.distance = distance
+		self.depth = depth
 
 		self.init_conv = nn.Sequential(
 			nn.Conv2d(in_channels=3, out_channels=64, kernel_size=kernel, padding=kernel//2),
@@ -46,7 +46,7 @@ class VDsrcnn(torch.nn.Module):
 		input_x = x
 		x = self.init_conv(x)
 
-		for i in range(self.distance - 2):
+		for i in range(self.depth - 2):
 			x = self.mid_conv(x)
 
 		x = self.end_conv(x)

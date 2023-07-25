@@ -238,3 +238,87 @@ def sr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
 
 def residual_MSELoss(x, convoluted_x, y):
     return torch.mean(torch.square((y - x) - convoluted_x))
+
+def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss_list=[]):
+    """
+    Trains a super resolution network by running through given dataset
+
+     Variables
+    dataset: batched classified dataset  
+    model: network architecture
+    loss_fn: loss function
+    device: cpu or gpu
+    opitimiser: optimising function
+    PSNR_list: empty list in which average PSNR is stored per epoch
+    loss_list: empty list in which average loss is stored per epoch
+    """
+
+    total_loss = 0
+    total_PSNR = 0
+        
+    batches = (len(dataset))
+    
+    for batch, (x, y) in enumerate(dataset):
+		
+        percentage = round(100 * ((batch + 1)/batches), 1)
+        print(f"Training: {percentage}%", end="\r")
+
+        (x, y) = (x.to(device), y.to(device))
+
+        prediction = model(x)
+        loss = loss_fn(x, prediction - x, y)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss
+        total_PSNR += eval_PSNR(prediction, y)
+
+    avg_PSNR = total_PSNR / batches
+    avg_loss = total_loss / batches
+
+    print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
+    loss_list.append(avg_loss)
+    PSNR_list.append(avg_PSNR)
+
+def vdsr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
+    """
+    Test a super resolution network by running through given dataset
+
+     Variables
+    dataset: batched classified dataset  
+    model: network architecture
+    loss_fn: loss function
+    device: cpu or gpu
+    opitimiser: optimising function
+    PSNR_list: empty list in which average PSNR is stored per epoch
+    loss_list: empty list in which average loss is stored per epoch
+    """
+
+    model.eval()
+
+    total_loss = 0
+    total_PSNR = 0
+        
+    batches = (len(dataset))
+    
+    for batch, (x, y) in enumerate(dataset):
+		
+        percentage = round(100 * ((batch + 1)/batches), 1)
+        print(f"Testing: {percentage}%", end="\r")
+
+        (x, y) = (x.to(device), y.to(device))
+
+        prediction = model(x)
+        loss = loss_fn(x, prediction - x, y)
+
+        total_loss += loss
+        total_PSNR += eval_PSNR(prediction, y)
+
+    avg_PSNR = total_PSNR / batches
+    avg_loss = total_loss / batches
+
+    print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
+    loss_list.append(avg_loss)
+    PSNR_list.append(avg_PSNR)
