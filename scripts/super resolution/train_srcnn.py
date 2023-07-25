@@ -27,7 +27,7 @@ EPOCHS = 20
 BATCH_SIZE = 256
 
 IMAGE_SLICE_SIZE = 33
-SCALE_FACTOR = 4
+SCALE_FACTOR = 8
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

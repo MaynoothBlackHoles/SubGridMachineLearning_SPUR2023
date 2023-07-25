@@ -27,13 +27,13 @@ EPOCHS = 20
 BATCH_SIZE = 512
 
 IMAGE_SLICE_SIZE = 33
-SCALE_FACTOR = 2
+SCALE_FACTOR = 8
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.VDsrcnn.to(device)
+model = net.VDsrcnn(depth=5).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nf.residual_MSELoss()
 

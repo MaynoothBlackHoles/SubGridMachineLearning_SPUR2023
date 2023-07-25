@@ -15,7 +15,7 @@ from src import subgridmodel as sgm
 
 # parameters
 IMAGE_SLICE_SIZE = 33
-SCALE_FACTOR = 4
+SCALE_FACTOR = 8
 LOW_RES = IMAGE_SLICE_SIZE // SCALE_FACTOR
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
@@ -56,7 +56,7 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
 
 # taking out images from the datset and converting them into torch tensors
 print("[INFO] Extracting images")
-tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=500)
+tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg")
 
 # saving and sorting datasets
 print("[INFO] Creating datasets")
