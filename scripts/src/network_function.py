@@ -235,3 +235,6 @@ def sr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
     print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
     PSNR_list.append(avg_PSNR)
+
+def residual_MSELoss(x, convoluted_x, y):
+    return torch.mean(torch.square((y - x) - convoluted_x))
