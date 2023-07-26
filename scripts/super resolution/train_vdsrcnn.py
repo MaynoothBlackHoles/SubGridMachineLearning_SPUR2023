@@ -3,7 +3,6 @@ Script used to train networks with chosen architecture and custom datasets
 """
 
 import torch
-from torch import nn
 import matplotlib.pyplot as plt
 import time
 import numpy as np
@@ -39,8 +38,8 @@ loss_fn = nf.residual_MSELoss
 
 # establishing dataset
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/sf2_sliced_blured_training_{IMAGE_SLICE_SIZE}s.pt")
-test_data = torch.load(current_dir + f"/data/sf2_sliced_blured_validation_{IMAGE_SLICE_SIZE}s.pt")
+train_data = torch.load(current_dir +  f"/data/training_sf234_gb_{IMAGE_SLICE_SIZE}ss.pt")
+test_data = torch.load(current_dir + f"/data/validation_sf234_gb_{IMAGE_SLICE_SIZE}ss.pt")
 print("[INFO] Batching Data")
 train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
 test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
@@ -81,10 +80,10 @@ for i in range(EPOCHS):
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
 
-    plt.savefig("plot_vdsr")
+    plt.savefig("plot_vdsr234")
 
     # saving model network weights each epoch
-    torch.save(model.state_dict(), f"vdsrcnn_{IMAGE_SLICE_SIZE}ss_gb_sf{SCALE_FACTOR}.pt")
+    torch.save(model.state_dict(), f"vdsrcnn_{IMAGE_SLICE_SIZE}ss_gb_sf234.pt")
     
 print("[INFO] Done! :D")
 plt.show()

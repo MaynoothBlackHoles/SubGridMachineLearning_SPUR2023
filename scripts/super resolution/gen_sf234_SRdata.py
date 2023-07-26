@@ -15,16 +15,26 @@ from src import subgridmodel as sgm
 
 # parameters
 IMAGE_SLICE_SIZE = 33
-SCALE_FACTOR = 3
-MAX_EXTRACT = 100
-LOW_RES = IMAGE_SLICE_SIZE // SCALE_FACTOR
+MAX_EXTRACT = -1
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 # data transforms
 data_ToTensor = transforms.ToTensor()
-data_downscale = transforms.Compose([
+data_downscale_sf2 = transforms.Compose([
     transforms.GaussianBlur(kernel_size=(5, 5)),
-    transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
+    transforms.Resize(IMAGE_SLICE_SIZE //2, interpolation=INTERPOLATION),
+    transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
+    transforms.ToTensor()
+])
+data_downscale_sf3 = transforms.Compose([
+    transforms.GaussianBlur(kernel_size=(5, 5)),
+    transforms.Resize(IMAGE_SLICE_SIZE//3, interpolation=INTERPOLATION),
+    transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
+    transforms.ToTensor()
+])
+data_downscale_sf4 = transforms.Compose([
+    transforms.GaussianBlur(kernel_size=(5, 5)),
+    transforms.Resize(IMAGE_SLICE_SIZE//4, interpolation=INTERPOLATION),
     transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
 ])
@@ -64,12 +74,21 @@ print("[INFO] Creating datasets")
 sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
 random.shuffle(sliced_tensor_list)
 print(f"[INFO] Total amount of samples: {len(sliced_tensor_list)}")
-downscaled = transform_tensors(sliced_tensor_list, data_downscale)
-downscaled = torch.stack(downscaled)
-high_res = transform_tensors(sliced_tensor_list)
-high_res = torch.stack(high_res)
+downscaled_sf2 = transform_tensors(sliced_tensor_list, data_downscale_sf2)
+downscaled_sf2 = torch.stack(downscaled_sf2)
 
-split_num = int(len(sliced_tensor_list) * 0.9)
+downscaled_sf3 = transform_tensors(sliced_tensor_list, data_downscale_sf3)
+downscaled_sf3 = torch.stack(downscaled_sf3)
+
+downscaled_sf4 = transform_tensors(sliced_tensor_list, data_downscale_sf4)
+downscaled_sf4 = torch.stack(downscaled_sf4)
+
+downscaled = torch.stack((downscaled_sf2, downscaled_sf3, downscaled_sf4))
+
+high_res = transform_tensors(sliced_tensor_list)
+high_res = torch.stack((high_res, high_res, high_res))
+
+split_num = int(len(sliced_tensor_list) * 0.9) * 3
 training = (downscaled[:split_num], high_res[:split_num])
 validation = (downscaled[split_num:], high_res[split_num:])
 
@@ -78,7 +97,7 @@ def save_data(dataset, name):
 
 # saving data
 print("[INFO] Saving datasets")
-save_data(training, name=f"training_sf{SCALE_FACTOR}_gb_{IMAGE_SLICE_SIZE}ss")
-save_data(validation, name=f"validation_sf{SCALE_FACTOR}_gb_{IMAGE_SLICE_SIZE}ss")
+save_data(training, name=f"training_sf234_gb_{IMAGE_SLICE_SIZE}ss")
+save_data(validation, name=f"validation_sf234_gb_{IMAGE_SLICE_SIZE}ss")
 
 print("[INFO] Done!")

@@ -71,7 +71,7 @@ for i in range(EPOCHS):
     plt.subplot(211)
     plt.plot(epochs_list, dictionary["train PSNR"], label="train", color="green")
     plt.plot(epochs_list, dictionary["test PSNR"], label="test", color="red")
-    plt.plot(epochs_list, ones_list * 32.97, label="bicubic", color="blue")
+    plt.plot(epochs_list, ones_list * 29.3, label="bicubic", color="blue")
     plt.ylabel("PSNR")
     plt.legend()
 
