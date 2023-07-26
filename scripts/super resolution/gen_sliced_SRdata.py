@@ -15,7 +15,7 @@ from src import subgridmodel as sgm
 
 # parameters
 IMAGE_SLICE_SIZE = 33
-SCALE_FACTOR = 8
+SCALE_FACTOR = 2
 LOW_RES = IMAGE_SLICE_SIZE // SCALE_FACTOR
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
