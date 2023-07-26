@@ -35,7 +35,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # loadng network architecture, choosing optimiser and loss function
 model = net.VDsrcnn(depth=5).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=0.9)
-loss_fn = nf.residual_MSELoss()
+loss_fn = nf.residual_MSELoss
 
 # establishing dataset
 print("[INFO] Loading datasets")
