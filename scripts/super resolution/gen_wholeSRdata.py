@@ -20,15 +20,14 @@ sys.path.append(parent_dir)
 # parameters
 IMAGE_SIZE = 500
 SCALE_FACTOR = 2
-LOW_RES = IMAGE_SIZE // SCALE_FACTOR
-EXTRACT_SIZE = 100
+MAX_EXTRACT = 100
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 # data transforms
 data_ToTensor = transforms.ToTensor()
 data_downscale = transforms.Compose([
     transforms.GaussianBlur(kernel_size=(5, 5)),
-    transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
+    transforms.Resize(IMAGE_SIZE // SCALE_FACTOR, interpolation=INTERPOLATION),
     transforms.Resize(IMAGE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
 ])
@@ -61,7 +60,7 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
 
 # taking out images from the datset and converting them into torch tensors
 print("[INFO] Extracting images")
-tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=EXTRACT_SIZE)
+tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=MAX_EXTRACT)
 
 # saving and sorting datasets
 print("[INFO] Creating datasets")
@@ -72,11 +71,12 @@ high_res = transform_tensors(tensor_list)
 
 data = (downscaled, high_res)
 
+print("[INFO] Saving datasets")
+dictionary = {"images": data, "properties": {"dataset size": MAX_EXTRACT, "scale factor": SCALE_FACTOR, "Gaussian blur": True}}
+
 def save_data(dataset, name):
     torch.save(dataset, current_dir + f"/data/{name}.pt")
 
-# saving data
-print("[INFO] Saving datasets")
-save_data(data, name=f"sample_{IMAGE_SIZE}s")
+save_data(dictionary, name=f"sample_{SCALE_FACTOR}", )
 
 print("[INFO] Done!")

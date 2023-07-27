@@ -17,14 +17,14 @@ from src import subgridmodel as sgm
 IMAGE_SLICE_SIZE = 33
 SCALE_FACTOR = 3
 MAX_EXTRACT = 100
-LOW_RES = IMAGE_SLICE_SIZE // SCALE_FACTOR
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
 # data transforms
 data_ToTensor = transforms.ToTensor()
+
 data_downscale = transforms.Compose([
     transforms.GaussianBlur(kernel_size=(5, 5)),
-    transforms.Resize(LOW_RES, interpolation=INTERPOLATION),
+    transforms.Resize(IMAGE_SLICE_SIZE // SCALE_FACTOR, interpolation=INTERPOLATION),
     transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
     transforms.ToTensor()
 ])
@@ -63,6 +63,8 @@ tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/
 print("[INFO] Creating datasets")
 sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
 random.shuffle(sliced_tensor_list)
+size = len(sliced_tensor_list)
+
 print(f"[INFO] Total amount of samples: {len(sliced_tensor_list)}")
 downscaled = transform_tensors(sliced_tensor_list, data_downscale)
 downscaled = torch.stack(downscaled)
@@ -73,12 +75,13 @@ split_num = int(len(sliced_tensor_list) * 0.9)
 training = (downscaled[:split_num], high_res[:split_num])
 validation = (downscaled[split_num:], high_res[split_num:])
 
+# saving data
+print("[INFO] Saving datasets")
+dictionary = {"training": training, "validation": validation, "properties": {"image patch size": IMAGE_SLICE_SIZE, "dataset size": size, "scale factor": SCALE_FACTOR, "Gaussian blur": True}}
+
 def save_data(dataset, name):
     torch.save(dataset, current_dir + f"/data/{name}.pt")
 
-# saving data
-print("[INFO] Saving datasets")
-save_data(training, name=f"training_sf{SCALE_FACTOR}_gb_{IMAGE_SLICE_SIZE}ss")
-save_data(validation, name=f"validation_sf{SCALE_FACTOR}_gb_{IMAGE_SLICE_SIZE}ss")
+save_data(dictionary, name=f"dataset_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}", )
 
 print("[INFO] Done!")

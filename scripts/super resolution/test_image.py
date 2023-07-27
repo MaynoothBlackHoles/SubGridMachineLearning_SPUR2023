@@ -21,7 +21,7 @@ from src import sr_networks as net
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # pick names of weights and dataset
-weights_name = "srcnn33_slices.pt"
+weights_name = "srcnn33_slices_blured.pt"
 dataset_name = "sample_500s.pt"
 
 # loading network architecture and saved weights

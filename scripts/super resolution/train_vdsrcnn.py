@@ -23,26 +23,25 @@ from src import subgridmodel as sgm
 # hyperparameters
 LEARNING_RATE = 1e-3
 EPOCHS = 20
-BATCH_SIZE = 512
+BATCH_SIZE = 128
 
 IMAGE_SLICE_SIZE = 33
 SCALE_FACTOR = 2
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+print(device)
 # loadng network architecture, choosing optimiser and loss function
 model = net.VDsrcnn(depth=5).to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=0.9)
+optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nf.residual_MSELoss
 
 # establishing dataset
 print("[INFO] Loading datasets")
-train_data = torch.load(current_dir +  f"/data/training_sf234_gb_{IMAGE_SLICE_SIZE}ss.pt")
-test_data = torch.load(current_dir + f"/data/validation_sf234_gb_{IMAGE_SLICE_SIZE}ss.pt")
+dataset = torch.load(current_dir +  f"/data/dataset_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
 print("[INFO] Batching Data")
-train_data = sgm.batch_classified_data(train_data, BATCH_SIZE)
-test_data = sgm.batch_classified_data(test_data, BATCH_SIZE)
+dataset["training"] = sgm.batch_classified_data(dataset["training"], BATCH_SIZE)
+dataset["validation"] = sgm.batch_classified_data(dataset["validation"], BATCH_SIZE)
 
 # dictionary to store values
 dictionary = {"train PSNR": [], "train loss": [], "test PSNR": [], "test loss": []}
@@ -55,8 +54,8 @@ for i in range(EPOCHS):
     time_start = time.time()
 
     # training, testing and evaluating chosen metric (PSNR) and loss
-    nf.vdsr_train_loop(train_data, model, loss_fn, device, optimizer, dictionary["train PSNR"], dictionary["train loss"])
-    nf.vdsr_test_loop(test_data, model, loss_fn, device, dictionary["test PSNR"], dictionary["test loss"])
+    nf.vdsr_train_loop(dataset["training"], model, loss_fn, device, optimizer, dictionary["train PSNR"], dictionary["train loss"])
+    nf.vdsr_test_loop(dataset["validation"], model, loss_fn, device, dictionary["test PSNR"], dictionary["test loss"])
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
@@ -80,10 +79,10 @@ for i in range(EPOCHS):
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
 
-    plt.savefig("plot_vdsr234")
+    plt.savefig("plot_vdsrcnn")
 
     # saving model network weights each epoch
-    torch.save(model.state_dict(), f"vdsrcnn_{IMAGE_SLICE_SIZE}ss_gb_sf234.pt")
+    torch.save(model.state_dict(), f"vdsrcnn_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
     
 print("[INFO] Done! :D")
 plt.show()
