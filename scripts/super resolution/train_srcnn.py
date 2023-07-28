@@ -27,6 +27,7 @@ EPOCHS = 20
 BATCH_SIZE = 256
 
 # dataset features
+SIZE = 1
 IMAGE_SLICE_SIZE = 33
 SCALE_FACTOR = 2
 
@@ -41,7 +42,7 @@ loss_fn = nn.MSELoss()
 
 # establishing dataset
 print("[INFO] Loading datasets")
-dataset = torch.load(current_dir +  f"/data/dataset_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
+dataset = torch.load(current_dir +  f"/data/dataset_{SIZE}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
 print("[INFO] Batching Data")
 dataset["training"] = sgm.batch_classified_data(dataset["training"], BATCH_SIZE)
 dataset["validation"] = sgm.batch_classified_data(dataset["validation"], BATCH_SIZE)
