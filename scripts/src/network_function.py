@@ -272,7 +272,7 @@ def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], lo
         loss.backward()
         optimizer.step()
 
-        total_loss += loss
+        total_loss += float(loss)
         total_PSNR += eval_PSNR(prediction, y)
 
     avg_PSNR = total_PSNR / batches
@@ -313,7 +313,7 @@ def vdsr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
         prediction = model(x)
         loss = loss_fn(x, prediction - x, y)
 
-        total_loss += loss
+        total_loss += float(loss)
         total_PSNR += eval_PSNR(prediction, y)
 
     avg_PSNR = total_PSNR / batches
