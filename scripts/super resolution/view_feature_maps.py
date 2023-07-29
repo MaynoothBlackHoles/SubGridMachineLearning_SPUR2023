@@ -36,4 +36,6 @@ for i in range(1, columns*rows +1):
     fig.add_subplot(rows, columns, i)
     plt.imshow(filter.detach())
     plt.axis("off")
+
+plt.colorbar()
 plt.show()

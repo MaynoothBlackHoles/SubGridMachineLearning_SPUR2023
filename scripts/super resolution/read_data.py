@@ -13,4 +13,3 @@ dataset_name = input("[INPUT] Name of dataset: ")
 dataset = torch.load(current_dir + f"/data/{dataset_name}")
 
 print(dataset["properties"])
-

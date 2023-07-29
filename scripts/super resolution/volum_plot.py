@@ -38,4 +38,4 @@ for i in range(n):
 b = np.random.randn(n, n, n)
 
 # plotting
-plot_density(b)
+plot_density(a)

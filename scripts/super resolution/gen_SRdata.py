@@ -52,13 +52,13 @@ tensor_list = tensor_list[:SIZE]
 # saving and sorting datasets
 print("[INFO] Creating datasets")
 sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
-random.shuffle(sliced_tensor_list)
 
 downscaled = []
 high_res = []
 
 print("[INFO] Looping though scale factors")
 for scale_factor in SCALE_FACTORS:
+    random.shuffle(sliced_tensor_list)
     data_downscale = transforms.Compose([
         transforms.GaussianBlur(kernel_size=(5, 5)),
         transforms.Resize(IMAGE_SLICE_SIZE // scale_factor, interpolation=INTERPOLATION),
