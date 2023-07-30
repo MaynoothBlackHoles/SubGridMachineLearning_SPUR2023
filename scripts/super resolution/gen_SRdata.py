@@ -55,8 +55,10 @@ sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
 
 downscaled = []
 high_res = []
+single_sf_datasets = []
 
 print("[INFO] Looping though scale factors")
+original_data = transform_tensors(sliced_tensor_list)
 for scale_factor in SCALE_FACTORS:
     random.shuffle(sliced_tensor_list)
     data_downscale = transforms.Compose([
@@ -65,8 +67,14 @@ for scale_factor in SCALE_FACTORS:
         transforms.Resize(IMAGE_SLICE_SIZE, interpolation=INTERPOLATION),
         transforms.ToTensor()])
     
-    high_res.extend(transform_tensors(sliced_tensor_list))
-    downscaled.extend(transform_tensors(sliced_tensor_list, data_downscale))
+    scaled_data = transform_tensors(sliced_tensor_list, data_downscale)
+
+    high_res.extend(original_data)
+    downscaled.extend(scaled_data)
+
+    single_sf_datasets.append([scaled_data,high_res])
+
+
 
 # fancy code to shuffle the datasets nicely
 c = list(zip(downscaled, high_res))
@@ -85,6 +93,7 @@ validation = (downscaled[split_num:], high_res[split_num:])
 print("[INFO] Saving datasets")
 dictionary = {"training": training, 
               "validation": validation,
+              "single sf data": single_sf_datasets,
               "properties": {"image patch size": IMAGE_SLICE_SIZE, "dataset size": SIZE, "scale factor": SCALE_FACTORS, "Gaussian blur": True}}
 
 def save_data(dataset, name):
