@@ -5,8 +5,6 @@ import torchvision
 import matplotlib.pyplot as plt
 import torch
 import time
-from sklearn.metrics import classification_report
-import numpy as np
 
 dropout_p = .25
 
@@ -213,8 +211,5 @@ plt.legend(loc="lower left")
 plt.grid()
 plt.savefig("plot")
 plt.show()
-
-# generate a classification report
-#print(classification_report(testData.targets.cpu().numpy(), np.array(preds), target_names=testData.classes))
 
 #torch.save(model, "model")

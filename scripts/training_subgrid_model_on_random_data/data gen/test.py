@@ -1,10 +1,14 @@
+import os
 import sys
-sys.path.append("C:/Users/drozd/Documents/programming stuff/Python Programms/SPUR/training_on_random_data")
-from src import subgridmodel as sgm
 import time
 
+current_dir = os.getcwd()
+sys.path.append(current_dir + "/../../..")
+
+from subgrid_physics_modelling import synthetic_data_generation as sdg
+
 time_start = time.time()
-data = sgm.generate_dataset(size=1, box_lenght=64)
+data = sdg.generate_dataset(size=1, box_lenght=64)
 time_end = time.time()
 print(f"Time to gen data: {time_end - time_start}")
 
