@@ -187,29 +187,29 @@ with torch.no_grad():
 			print(preds)
 		
 # generate a classification report
-from sklearn.metrics import classification_report
-print(classification_report(testData.targets.cpu().numpy(), np.array(preds), target_names = testData.classes))
+# from sklearn.metrics import classification_report
+# print(classification_report(testData.targets.cpu().numpy(), np.array(preds), target_names = testData.classes))
 
-"""from sklearn.metrics import precision_score
-print("------------------------------")
-newlist = testData.targets.tolist()
-print(precision_score(newlist, preds))"""
+# """from sklearn.metrics import precision_score
+# print("------------------------------")
+# newlist = testData.targets.tolist()
+# print(precision_score(newlist, preds))"""
 
-plt.hist()
+# plt.hist()
 
 
-# plot the training loss and accuracy
-#plt.figure()
-"""plt.plot(H["train_loss"], label="train_loss")
-plt.plot(H["train_acc"], label="train_acc")
-plt.plot(H["val_loss"], label="val_loss")
-plt.plot(H["val_acc"], label="val_acc")
-plt.title("Training Loss and Accuracy on Dataset")
-plt.xlabel("Epoch #")
-plt.ylabel("Loss/Accuracy")
-plt.legend(loc="lower left")
-plt.savefig("plot")
-plt.show()"""
+# # plot the training loss and accuracy
+# #plt.figure()
+# """plt.plot(H["train_loss"], label="train_loss")
+# plt.plot(H["train_acc"], label="train_acc")
+# plt.plot(H["val_loss"], label="val_loss")
+# plt.plot(H["val_acc"], label="val_acc")
+# plt.title("Training Loss and Accuracy on Dataset")
+# plt.xlabel("Epoch #")
+# plt.ylabel("Loss/Accuracy")
+# plt.legend(loc="lower left")
+# plt.savefig("plot")
+# plt.show()"""
 
-# serialize the model to disk
-torch.save(model, "KMNIST_model.pt")
+# # serialize the model to disk
+# torch.save(model, "KMNIST_model.pt")

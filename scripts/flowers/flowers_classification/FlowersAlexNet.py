@@ -1,6 +1,4 @@
 import torchvision.transforms.v2 as transforms
-from sklearn.metrics import classification_report
-from torch.utils.data import random_split
 from torch.utils.data import DataLoader
 from torch import nn
 import torchvision

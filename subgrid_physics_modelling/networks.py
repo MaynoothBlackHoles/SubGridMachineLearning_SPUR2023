@@ -5,6 +5,7 @@ File which holds network architectures for binary classification
 import torch
 from torch import nn
 
+
 class Fully_connected_1layer(torch.nn.Module):
 	def __init__(self, box_length, neurons=1000):
 		super(Fully_connected_1layer, self).__init__()
@@ -21,6 +22,8 @@ class Fully_connected_1layer(torch.nn.Module):
 		
 	def forward(self, x):
 		return self.stack(x)
+
+
 
 class Fully_connected_2layer(torch.nn.Module):
 	def __init__(self, box_length, neurons=1000):
@@ -40,6 +43,8 @@ class Fully_connected_2layer(torch.nn.Module):
 		
 	def forward(self, x):
 		return self.stack(x)
+
+
 
 class conv1(torch.nn.Module):
 	def __init__(self, numChannels=5, classes=2):
@@ -63,6 +68,8 @@ class conv1(torch.nn.Module):
 		
 	def forward(self, x):
 		return self.stack(x)
+
+
 
 class Kernel1_conv(torch.nn.Module):
 	def __init__(self, box_length, numChannels=5, classes=2):
@@ -89,6 +96,7 @@ class Kernel1_conv(torch.nn.Module):
 		return self.stack(x)
 
 	
+
 class Kernel1_conv_big(torch.nn.Module):
 	def __init__(self, box_length, numChannels=5, classes=2):
 		super(Kernel1_conv_big, self).__init__()
@@ -129,6 +137,8 @@ class Kernel1_conv_big(torch.nn.Module):
 	def forward(self, x):
 		return self.stack(x)	
 		
+    
+    
 class Kernel1_conv_big1(torch.nn.Module):
 	def __init__(self, box_length, numChannels=5, classes=2):
 		super(Kernel1_conv_big1, self).__init__()
@@ -157,6 +167,8 @@ class Kernel1_conv_big1(torch.nn.Module):
 	def forward(self, x):
 		return self.stack(x)	
 		
+    
+    
 class S1(torch.nn.Module):
 	def __init__(self, N_0, box_length=64, numChannels=5, classes=2, p_dropout=0.2):
 		super(S1, self).__init__()
@@ -191,6 +203,8 @@ class S1(torch.nn.Module):
 	def forward(self, x):
 		return self.stack(x)
 
+
+
 class S1_simple(torch.nn.Module):
 	def __init__(self, N_0, box_length, numChannels=5, classes=2, p_dropout=0.2):
 		super(S1_simple, self).__init__()
@@ -219,6 +233,8 @@ class S1_simple(torch.nn.Module):
 	def forward(self, x):
 		return self.stack(x)
 
+
+
 class Srcnn(torch.nn.Module):
 	def __init__(self, f_1=9, f_2=5, f_3=5	):
 		super(Srcnn, self).__init__()
@@ -235,3 +251,43 @@ class Srcnn(torch.nn.Module):
 		
 	def forward(self, x):
 		return self.stack(x)
+    
+    
+
+class CompactObjectConv(torch.nn.Module):
+    """
+    This network is designed to learn a subgrid model for star and black hole
+    formation. It can be applied to inputs whose hape is (6, Nx, Ny, Nz) where
+    Nx, Ny and Nz can be varied. This allows the model to be trained on smaller
+    regions and then be applied to larger regions.
+    """
+    
+    def __init__(self, numChannels=6, classes=4):
+        super().__init__()
+        
+        self.stack = nn.Sequential(
+			nn.Conv3d(in_channels  = numChannels,
+                      out_channels = 6,
+                      kernel_size  = 1,
+                      stride       = 1),
+			nn.ReLU(),
+
+			nn.Conv3d(in_channels  = 6, 
+                      out_channels = 1, 
+                      kernel_size  = 1, 
+                      stride       = 1),
+			nn.ReLU(),
+            
+			nn.AdaptiveAvgPool3d(7),
+
+			nn.Flatten(),
+			nn.Linear(in_features  = 7**3, 
+                      out_features = 100),
+			nn.ReLU(),
+
+			nn.Linear(in_features  = 100, out_features = classes),
+			nn.Softmax(dim=1)
+			)
+    
+    def forward(self, x):
+        return self.stack(x)

@@ -29,7 +29,7 @@ def train_loop(dataset, model, loss_fn, device, optimizer, correct_list=[], loss
 		
         if (batch + 1) % 2 == 0:
             percentage = round(100 * ((batch + 1)/batches), 1)
-            print(f"Training epoch {percentage}% done", end="\r")
+            print(f"\rTraining epoch {percentage}% done", end="")
 
         (x, y) = (x.to(device), y.to(device))
 
@@ -46,11 +46,14 @@ def train_loop(dataset, model, loss_fn, device, optimizer, correct_list=[], loss
     
     avg_loss = total_loss / batches
     correct = total_correct / size
-
+    
+    print("")
     print(f"Train Error: \n Accuracy: {(correct):.2f}, Avg loss: {avg_loss:.3f} \n")
     correct_list.append(correct)
     loss_list.append(avg_loss)
 	
+    
+    
 def test_loop(dataset, model, loss_fn, device, correct_list=[], loss_list=[]):
     """
     Test network by running through given dataset
@@ -87,6 +90,8 @@ def test_loop(dataset, model, loss_fn, device, correct_list=[], loss_list=[]):
     correct_list.append(correct)
     loss_list.append(avg_loss)
     
+    
+    
 def test_sliced_data(dataset, model, device):
     """
     Tests model on given sliced classified (batched size = 1) dataset
@@ -121,6 +126,8 @@ def test_sliced_data(dataset, model, device):
 
     print(f"Test Error: \n Accuracy: {(correct):.2f} \n")
 
+
+
 def eval_PSNR(x, y):
     """
     Function to evaluate the PSNR of two tensors; x, y
@@ -129,6 +136,8 @@ def eval_PSNR(x, y):
     MAX_I = torch.max(x)
     PSNR = 20*torch.log10(torch.tensor(MAX_I)) - 10*torch.log10(MSE)
     return float(PSNR)
+
+
 
 def test_PSNR(dataset):
     """
@@ -149,6 +158,8 @@ def test_PSNR(dataset):
 
     avg_PSNR = total_PSNR / batches
     return avg_PSNR
+
+
 
 def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss_list=[]):
     """
@@ -194,6 +205,8 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss
     loss_list.append(avg_loss)
     PSNR_list.append(avg_PSNR)
 
+
+
 def sr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
     """
     Test a super resolution network by running through given dataset
@@ -236,8 +249,12 @@ def sr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
     loss_list.append(avg_loss)
     PSNR_list.append(avg_PSNR)
 
+
+
 def residual_MSELoss(x, convoluted_x, y):
     return torch.mean(torch.square((y - x) - convoluted_x))
+
+
 
 def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss_list=[]):
     """
@@ -281,6 +298,8 @@ def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], lo
     print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
     PSNR_list.append(avg_PSNR)
+
+
 
 def vdsr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
     """

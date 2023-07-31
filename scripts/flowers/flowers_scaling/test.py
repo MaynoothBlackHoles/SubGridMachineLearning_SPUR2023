@@ -16,7 +16,7 @@ from scipy.ndimage import gaussian_filter, zoom
 
 #%%
 current_directory = os.getcwd()
-data_dir = current_directory + '/../../data/flowers'
+data_dir = current_directory + '/../../../data/flowers'
 
 if not os.path.exists(data_dir):
     os.mkdir(data_dir)
