@@ -4,14 +4,16 @@ import torch
 from PIL import Image
 import random
 
-import sys
 import os
+import sys
 current_dir = os.getcwd()
-parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/")
-sys.path.append(parent_dir)
+top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+sys.path.append(top_dir)
+top_dir = top_dir.replace("\\", "/")
 
-from src import subgridmodel as sgm
+DATA_DIR = top_dir + "/data/super_resolution/datasets"
+
+from subgrid_physics_modelling import data_utils as du
 
 # parameters
 IMAGE_SLICE_SIZE = 33
@@ -25,7 +27,7 @@ data_ToTensor = transforms.ToTensor()
 # loading this dataset with torchvision will install, among other things, a folder with all of the images in the dataset which we take out manually with 
 # the extract tensors function later on
 print("[INFO] Loading dummy_data")
-dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", download=True, transform=transforms.ToTensor())
+dummy_data = torchvision.datasets.Flowers102(root=DATA_DIR, download=True, transform=transforms.ToTensor())
 
 def extract_tensors(folder_location):
     tensor_list = []
@@ -45,13 +47,13 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
 
 # taking out images from the datset and converting them into torch tensors
 print("[INFO] Extracting images")
-tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg")
+tensor_list = extract_tensors(folder_location=DATA_DIR + "/flowers-102/jpg")
 random.shuffle(tensor_list)
 tensor_list = tensor_list[:SIZE]
 
 # saving and sorting datasets
 print("[INFO] Creating datasets")
-sliced_tensor_list = sgm.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
+sliced_tensor_list = du.sr_data_slicer(tensor_list, IMAGE_SLICE_SIZE)
 
 downscaled = []
 high_res = []

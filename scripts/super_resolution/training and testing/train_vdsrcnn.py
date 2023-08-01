@@ -8,10 +8,13 @@ import time
 import numpy as np
 
 import os
+import sys
 current_dir = os.getcwd()
-current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
-top_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir, os.pardir))
-os.chdir(top_dir)
+top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+sys.path.append(top_dir)
+top_dir = top_dir.replace("\\", "/")
+
+DATA_DIR = top_dir + "/data/super_resolution/datasets"
 
 from subgrid_physics_modelling import network_training_utils as ntu
 from subgrid_physics_modelling import super_resolution_networks as net
@@ -23,11 +26,9 @@ EPOCHS        = 20
 BATCH_SIZE    = 128
 
 # dataset features
-SIZE             = 100
-IMAGE_SLICE_SIZE = 33
+BIG_TENSORS      = 10
+IMAGE_SLICE_SIZE = 32
 SCALE_FACTOR     = 2
-
-DATA_DIR = top_dir + "/data/super_resolution/datsets"
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -39,7 +40,7 @@ loss_fn = ntu.residual_MSELoss
 
 # establishing dataset
 print("[INFO] Loading datasets")
-dataset = torch.load(DATA_DIR +  f"/dataset_{SIZE}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
+dataset = torch.load(DATA_DIR +  f"/dataset_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
 print("[INFO] Batching Data")
 dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE)
 dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_SIZE)
@@ -81,10 +82,10 @@ for i in range(EPOCHS):
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
 
-    plt.savefig("plot_vdsrcnn")
+    plt.savefig(DATA_DIR + "/plot_vdsrcnn")
 
     # saving model network weights each epoch
-    torch.save(model.state_dict(), f"vdsrcnn_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
+    torch.save(model.state_dict(), DATA_DIR + f"/rcnn3d_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
     
 print("[INFO] Done! :D")
 plt.show()

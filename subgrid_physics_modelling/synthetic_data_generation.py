@@ -2,8 +2,8 @@ import torch
 import random
 import numpy as np
 
-from data_utils import classify_dataset, batch_classified_data
-from subgridmodel import H2_crit, rho_crit_star, rho_crit_BH
+from .data_utils import classify_dataset, batch_classified_data
+from .subgridmodel import H2_crit, rho_crit_star, rho_crit_BH
 
 
 def gen_uniform_tensor(box_lenght):

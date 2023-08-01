@@ -8,14 +8,12 @@ import torch
 from PIL import Image
 import random
 
-import sys
 import os
+import sys
 current_dir = os.getcwd()
-current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
-
-parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/") 
-sys.path.append(parent_dir)
+top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+sys.path.append(top_dir)
+top_dir = top_dir.replace("\\", "/")
 
 # parameters
 IMAGE_SIZE = 500
@@ -35,7 +33,7 @@ data_downscale = transforms.Compose([
 # loading this dataset with torchvision will install, among other things, a folder with all of the images in the dataset which we take out manually with 
 # the extract tensors function later on
 print("[INFO] Loading dummy_data")
-dummy_data = torchvision.datasets.Flowers102(root=current_dir + "/data", download=True, transform=transforms.ToTensor())
+dummy_data = torchvision.datasets.Flowers102(root=top_dir + "/data", download=True, transform=transforms.ToTensor())
 
 def extract_tensors(folder_location, max_size=-1):
     tensor_list = []

@@ -5,9 +5,9 @@ File which holds super resolution network architectures
 import torch
 from torch import nn
 
-class Srcnn(torch.nn.Module):
+class SRcnn(torch.nn.Module):
 	def __init__(self, f_1=9, f_2=1, f_3=5):
-		super(Srcnn, self).__init__()
+		super(SRcnn, self).__init__()
 
 		self.stack = nn.Sequential(
 			nn.Conv2d(in_channels=3, out_channels=64, kernel_size=f_1, padding=f_1//2),
@@ -22,9 +22,9 @@ class Srcnn(torch.nn.Module):
 	def forward(self, x):
 		return self.stack(x)
 	
-class VDsrcnn(torch.nn.Module):
+class VDSRcnn(torch.nn.Module):
 	def __init__(self, kernel=3, depth=6):
-		super(VDsrcnn, self).__init__()
+		super(VDSRcnn, self).__init__()
 
 		self.depth = depth
 

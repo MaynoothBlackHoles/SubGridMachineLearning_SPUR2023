@@ -3,9 +3,9 @@
 
 import torch
 import torchvision.transforms.v2 as transforms
-import scipy
 
-from subgridmodel import check_starForming
+from .subgridmodel import check_starForming
+from scipy.ndimage import zoom
 
 
 def classify_dataset(dataset):
@@ -165,9 +165,11 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
 
 def downscale_tensors(tensors, scale_factor):
     transformed_tensors = []
-    scale = (1/scale_factor, 1/scale_factor, 1/scale_factor)
+    scale = (1, 1/scale_factor, 1/scale_factor, 1/scale_factor)
 
     for i, tensor in enumerate(tensors):
-        tensor = scipy.ndimage.zoom(tensor, scale)
+        tensor = tensor[0] # funny tensor shape  # temp fix, look for cleaner solution 
+        tensor = zoom(tensor, (1, 1/scale_factor, 1/scale_factor, 1/scale_factor))
+        tensor = zoom(tensor, (1, scale_factor, scale_factor, scale_factor))
         transformed_tensors.append(tensor)
     return transformed_tensors

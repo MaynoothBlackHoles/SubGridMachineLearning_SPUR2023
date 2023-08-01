@@ -1,34 +1,40 @@
-import torchvision.transforms.v2 as transforms
-import torchvision
 import torch
 import random
 import numpy as np
 
 import os
+import sys
 current_dir = os.getcwd()
-top_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
+top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+sys.path.append(top_dir)
 top_dir = top_dir.replace("\\", "/")
-os.chdir(top_dir)
 
-from subgrid_physics_modelling import data_utils as du 
+DATA_DIR = top_dir + "/data/super_resolution/datasets"
+
+from subgrid_physics_modelling import data_utils as du
 
 # parameters
 IMAGE_SLICE_SIZE = 32
-SCALE_FACTOR = 2 # int, float or tuple
+SCALE_FACTOR = 2
+BIG_TENSORS = 10
 
-DATA_DIR = top_dir + "/data/super_resolution/datsets"
-
+print("[INFO] Loadig data")
 tensors_dict = np.load(DATA_DIR + "/snap_007_tensors.npz")
-tensors_list = []
-for key in tensors_dict:
-    tensors_list.append(tensors_dict[key])
 
-size = len(tensors_list)
+tensors_list = []
+tick = 0
+for key in tensors_dict:
+    tensors_list.append(torch.tensor(tensors_dict[key]).permute(3, 0, 1, 2))
+
+    tick += 1
+    if tick == BIG_TENSORS:
+        break
+
 
 print("[INFO] Creating datasets")
 sliced_tensor_list = du.sr_data_slicer(tensors_list, IMAGE_SLICE_SIZE, tensor_slicer=du.tensor_slicer_3d)
 random.shuffle(sliced_tensor_list)
-
+ 
 print("[INFO] Transforming tensors")
 downscaled = du.downscale_tensors(sliced_tensor_list, scale_factor=SCALE_FACTOR)
 high_res = du.transform_tensors(sliced_tensor_list)
@@ -43,11 +49,11 @@ validation = (downscaled[split_num:], high_res[split_num:])
 print("[INFO] Saving datasets")
 data_dict = {"training": training,
               "validation": validation,
-              "properties": {"image patch size": IMAGE_SLICE_SIZE, "dataset size": size, "scale factor": SCALE_FACTOR}}
+              "properties": {"image patch size": IMAGE_SLICE_SIZE, "dataset size": len(sliced_tensor_list), "scale factor": SCALE_FACTOR}}
 
 def save_data(dataset, name):
     torch.save(dataset, DATA_DIR + f"/{name}.pt")
 
-save_data(data_dict, name=f"dataset_{size}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}", )
+save_data(data_dict, name=f"dataset_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}", )
 
 print("[INFO] Done!")
