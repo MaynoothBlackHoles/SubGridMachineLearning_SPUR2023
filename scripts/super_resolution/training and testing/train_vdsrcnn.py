@@ -27,6 +27,8 @@ SIZE             = 100
 IMAGE_SLICE_SIZE = 33
 SCALE_FACTOR     = 2
 
+DATA_DIR = top_dir + "/data/super_resolution/datsets"
+
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -37,7 +39,7 @@ loss_fn = ntu.residual_MSELoss
 
 # establishing dataset
 print("[INFO] Loading datasets")
-dataset = torch.load(current_dir +  f"/data/dataset_{SIZE}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
+dataset = torch.load(DATA_DIR +  f"/dataset_{SIZE}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
 print("[INFO] Batching Data")
 dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE)
 dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_SIZE)

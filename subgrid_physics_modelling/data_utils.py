@@ -3,6 +3,7 @@
 
 import torch
 import torchvision.transforms.v2 as transforms
+import scipy
 
 from subgridmodel import check_starForming
 
@@ -136,7 +137,7 @@ def classified_data_slicer(classified_data, output_lenght):
 
 
 
-def sr_data_slicer(tensor_list, output_lenght):
+def sr_data_slicer(tensor_list, output_lenght, tensor_slicer=tensor_slicer_2d):
     """
     Creates a new dataset which takes in a list of tensors with a list of slices from each tensor
 
@@ -146,7 +147,7 @@ def sr_data_slicer(tensor_list, output_lenght):
     """
     sliced_tensors = []
     for i, tensor in enumerate(tensor_list):
-        sliced_tensor = tensor_slicer_2d(tensor, output_lenght)
+        sliced_tensor = tensor_slicer(tensor, output_lenght)
         sliced_tensors.extend(sliced_tensor)
 
     return sliced_tensors
@@ -157,5 +158,16 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
     transformed_tensors = []
     for i, tensor in enumerate(tensors):
         tensor = transform(tensor)
+        transformed_tensors.append(tensor)
+    return transformed_tensors
+
+
+
+def downscale_tensors(tensors, scale_factor):
+    transformed_tensors = []
+    scale = (1/scale_factor, 1/scale_factor, 1/scale_factor)
+
+    for i, tensor in enumerate(tensors):
+        tensor = scipy.ndimage.zoom(tensor, scale)
         transformed_tensors.append(tensor)
     return transformed_tensors
