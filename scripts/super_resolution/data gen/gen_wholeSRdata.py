@@ -19,7 +19,7 @@ sys.path.append(parent_dir)
 
 # parameters
 IMAGE_SIZE = 500
-SCALE_FACTOR = 2
+SCALE_FACTOR = 8
 MAX_EXTRACT = 100
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 

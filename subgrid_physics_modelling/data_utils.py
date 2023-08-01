@@ -4,7 +4,7 @@
 import torch
 import torchvision.transforms.v2 as transforms
 
-from .subgridmodel import check_starForming
+from subgridmodel import check_starForming
 
 
 def classify_dataset(dataset):

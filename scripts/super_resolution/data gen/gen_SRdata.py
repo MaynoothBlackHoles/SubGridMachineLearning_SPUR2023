@@ -15,7 +15,7 @@ from src import subgridmodel as sgm
 
 # parameters
 IMAGE_SLICE_SIZE = 33
-SCALE_FACTORS = 2,4,8 # int, float or tuple
+SCALE_FACTORS = 8 # int, float or tuple
 SIZE = 100 # size of datset will be the chosen number multiplied by the amount of tuples specifed in line above, if you want max exements slot in -1
 INTERPOLATION = torchvision.transforms.InterpolationMode.BICUBIC
 
@@ -59,7 +59,10 @@ single_sf_datasets = []
 
 print("[INFO] Looping though scale factors")
 original_data = transform_tensors(sliced_tensor_list)
-for scale_factor in SCALE_FACTORS:
+
+if type(SCALE_FACTORS) == int:
+    iterable = [SCALE_FACTORS]
+for scale_factor in iterable:
     random.shuffle(sliced_tensor_list)
     data_downscale = transforms.Compose([
         transforms.GaussianBlur(kernel_size=(5, 5)),
@@ -73,8 +76,6 @@ for scale_factor in SCALE_FACTORS:
     downscaled.extend(scaled_data)
 
     single_sf_datasets.append([scaled_data,high_res])
-
-
 
 # fancy code to shuffle the datasets nicely
 c = list(zip(downscaled, high_res))

@@ -12,40 +12,48 @@ import os
 current_dir = os.getcwd()
 current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
 
-parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/")
+parent_dir = os.path.abspath(os.path.join(current_dir, "..",".."))
 sys.path.append(parent_dir)
 
-from src import network_function as nf
+
+from src import network_function as ntu
 from src import sr_networks as net
-from src import subgridmodel as sgm
+from src import subgridmodel as sdg
+
+#from subgrid_physics_modelling import network_training_utils as ntu
+#from subgrid_physics_modelling import super_resolution_networks as net
+#from subgrid_physics_modelling import synthetic_data_generation as sdg
+
 
 # hyperparameters
 LEARNING_RATE = 1e-3
-EPOCHS = 20
-BATCH_SIZE = 128
+EPOCHS        = 20
+BATCH_SIZE    = 128
 
-SIZE = 100
+# dataset features
+SIZE             = 100
 IMAGE_SLICE_SIZE = 33
-SCALE_FACTOR = 2
+SCALE_FACTOR     = 2
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("################")
 print(device)
+
 # loadng network architecture, choosing optimiser and loss function
-model = net.VDsrcnn(depth=5).to(device)
+model = net.Residual_CNN_3D().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-loss_fn = nf.residual_MSELoss
+loss_fn = ntu.residual_MSELoss
 
 # establishing dataset
 print("[INFO] Loading datasets")
 dataset = torch.load(current_dir +  f"/data/dataset_{SIZE}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
 print("[INFO] Batching Data")
-dataset["training"] = sgm.batch_classified_data(dataset["training"], BATCH_SIZE)
-dataset["validation"] = sgm.batch_classified_data(dataset["validation"], BATCH_SIZE)
+dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE)
+dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_SIZE)
 
-# dictionary to store values
-dictionary = {"train PSNR": [], "train loss": [], "test PSNR": [], "test loss": []}
+# stats to store values
+stats = {"train PSNR": [], "train loss": [], "test PSNR": [], "test loss": []}
 
 print("[INFO] Training Network")
 epoch_num = 0
@@ -55,8 +63,8 @@ for i in range(EPOCHS):
     time_start = time.time()
 
     # training, testing and evaluating chosen metric (PSNR) and loss
-    nf.vdsr_train_loop(dataset["training"], model, loss_fn, device, optimizer, dictionary["train PSNR"], dictionary["train loss"])
-    nf.vdsr_test_loop(dataset["validation"], model, loss_fn, device, dictionary["test PSNR"], dictionary["test loss"])
+    ntu.vdsr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train PSNR"], stats["train loss"])
+    ntu.vdsr_test_loop(dataset["validation"], model, loss_fn, device, stats["test PSNR"], stats["test loss"])
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
@@ -66,16 +74,17 @@ for i in range(EPOCHS):
     ones_list = np.ones(i + 1)
 
     plt.clf()
+
     plt.subplot(211)
-    plt.plot(epochs_list, dictionary["train PSNR"], label="train", color="green")
-    plt.plot(epochs_list, dictionary["test PSNR"], label="test", color="red")
+    plt.plot(epochs_list, stats["train PSNR"], label="train", color="green")
+    plt.plot(epochs_list, stats["test PSNR"], label="test", color="red")
     plt.plot(epochs_list, ones_list * 32.97, label="bicubic", color="blue")
     plt.ylabel("PSNR")
     plt.legend()
 
     plt.subplot(212)
-    plt.plot(epochs_list, dictionary["train loss"], "--", label="train", color="darkgreen")
-    plt.plot(epochs_list, dictionary["test loss"], "--", label="test", color="darkred")
+    plt.plot(epochs_list, stats["train loss"], "--", label="train", color="darkgreen")
+    plt.plot(epochs_list, stats["test loss"], "--", label="test", color="darkred")
     plt.legend()
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
