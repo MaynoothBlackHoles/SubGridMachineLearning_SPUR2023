@@ -2,11 +2,6 @@ import torch
 import random
 import numpy as np
 
-import os
-import sys
-current_dir = os.getcwd()
-sys.path.append(current_dir)
-
 from data_utils import classify_dataset, batch_classified_data
 from subgridmodel import H2_crit, rho_crit_star, rho_crit_BH
 
