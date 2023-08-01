@@ -16,7 +16,7 @@ from subgrid_physics_modelling import data_utils as du
 # parameters
 IMAGE_SLICE_SIZE = 32
 SCALE_FACTOR = 2
-BIG_TENSORS = 10
+BIG_TENSORS = 1
 
 print("[INFO] Loadig data")
 tensors_dict = np.load(DATA_DIR + "/snap_007_tensors.npz")
@@ -37,7 +37,7 @@ random.shuffle(sliced_tensor_list)
  
 print("[INFO] Transforming tensors")
 downscaled = du.downscale_tensors(sliced_tensor_list, scale_factor=SCALE_FACTOR)
-high_res = du.transform_tensors(sliced_tensor_list)
+high_res = torch.stack(sliced_tensor_list)
 
 split_num = int(len(sliced_tensor_list) * 0.9)
 print(f"[INFO] Total amount of samples: {len(sliced_tensor_list)}")

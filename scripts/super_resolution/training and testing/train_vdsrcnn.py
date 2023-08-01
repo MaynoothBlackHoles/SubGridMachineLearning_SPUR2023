@@ -26,7 +26,7 @@ EPOCHS        = 20
 BATCH_SIZE    = 128
 
 # dataset features
-BIG_TENSORS      = 10
+BIG_TENSORS      = 1
 IMAGE_SLICE_SIZE = 32
 SCALE_FACTOR     = 2
 
@@ -71,7 +71,6 @@ for i in range(EPOCHS):
     plt.subplot(211)
     plt.plot(epochs_list, stats["train PSNR"], label="train", color="green")
     plt.plot(epochs_list, stats["test PSNR"], label="test", color="red")
-    plt.plot(epochs_list, ones_list * 32.97, label="bicubic", color="blue")
     plt.ylabel("PSNR")
     plt.legend()
 

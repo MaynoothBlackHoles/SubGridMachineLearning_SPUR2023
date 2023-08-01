@@ -154,22 +154,24 @@ def sr_data_slicer(tensor_list, output_lenght, tensor_slicer=tensor_slicer_2d):
 
 
 
-def transform_tensors(tensors, transform=transforms.ToTensor()):
+def transform_tensors(tensors):
     transformed_tensors = []
     for i, tensor in enumerate(tensors):
-        tensor = transform(tensor)
+        tensor = torch.from_numpy(tensor)
         transformed_tensors.append(tensor)
-    return transformed_tensors
+    return torch.stack(transformed_tensors)
 
 
 
 def downscale_tensors(tensors, scale_factor):
     transformed_tensors = []
     scale = (1, 1/scale_factor, 1/scale_factor, 1/scale_factor)
+    transform = transforms.ToTensor()
 
     for i, tensor in enumerate(tensors):
         tensor = tensor[0] # funny tensor shape  # temp fix, look for cleaner solution 
         tensor = zoom(tensor, (1, 1/scale_factor, 1/scale_factor, 1/scale_factor))
         tensor = zoom(tensor, (1, scale_factor, scale_factor, scale_factor))
+        tensor = torch.from_numpy(tensor)
         transformed_tensors.append(tensor)
-    return transformed_tensors
+    return torch.stack(transformed_tensors)
