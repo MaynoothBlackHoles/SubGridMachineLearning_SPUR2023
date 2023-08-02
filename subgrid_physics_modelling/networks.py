@@ -262,31 +262,41 @@ class CompactObjectConv(torch.nn.Module):
     regions and then be applied to larger regions.
     """
     
-    def __init__(self, numChannels=6, classes=4):
+    def __init__(self):
         super().__init__()
         
+        N = 21
+        
         self.stack = nn.Sequential(
-			nn.Conv3d(in_channels  = numChannels,
-                      out_channels = 6,
+			nn.Conv3d(in_channels  = 3,
+                      out_channels = N,
                       kernel_size  = 1,
                       stride       = 1),
-			nn.ReLU(),
-
-			nn.Conv3d(in_channels  = 6, 
-                      out_channels = 1, 
+            nn.LeakyReLU(),
+            
+            nn.Conv3d(in_channels  = N, 
+                      out_channels = N, 
                       kernel_size  = 1, 
                       stride       = 1),
-			nn.ReLU(),
+			nn.LeakyReLU(),
             
-			nn.AdaptiveAvgPool3d(7),
+            nn.Conv3d(in_channels  = N, 
+                      out_channels = N, 
+                      kernel_size  = 1, 
+                      stride       = 1),
+			nn.LeakyReLU(),
+            
+ 			nn.AdaptiveMaxPool3d((1, 1, 1)),
 
-			nn.Flatten(),
-			nn.Linear(in_features  = 7**3, 
-                      out_features = 100),
-			nn.ReLU(),
+ 			nn.Flatten(),
+            
+            nn.Linear(in_features = N, out_features = N),
+            nn.LeakyReLU(),
+            
+            nn.Linear(in_features = N, out_features = 2),
+            nn.LeakyReLU(),
 
-			nn.Linear(in_features  = 100, out_features = classes),
-			nn.Softmax(dim=1)
+ 			nn.Softmax(dim=1)
 			)
     
     def forward(self, x):

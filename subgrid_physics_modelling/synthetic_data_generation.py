@@ -174,8 +174,9 @@ def gen_fast_classified_data(size, box_lenght, max_stars=5, min_stars=1):
 #        Generating Data for Subgrid Model with Stars and Black Holes         #
 ###############################################################################
 
+width = 100
 
-def generate_random_compact_object_data(size, box_length):
+def generate_random_compact_object_data(size, box_length, include_BHs=False):
     """
     This function returns a dataset consisting of randomly generated tensors, 
     representing regions, which are classified into four classes:
@@ -191,7 +192,7 @@ def generate_random_compact_object_data(size, box_length):
     for i in range(size):
         
         X = generate_empty_region(box_length)
-        label = random.randint(0, 3)
+        label = random.randint(0, 1 + 2 * include_BHs)
         num_objects = random.randint(min_objects, max_objects)
         
         if label == 1:
@@ -220,7 +221,7 @@ def generate_empty_region(box_length):
     formation to break.
     """
     # Create tensor with random entries for velocity components
-    X = torch.randn(6, box_length, box_length, box_length)
+    X = torch.randn(3, box_length, box_length, box_length)
     
     # Iterate over all sites of the tensor.
     for i in range(box_length):
@@ -235,21 +236,21 @@ def generate_empty_region(box_length):
                     
                 # Add a velocity divergence
                 if conditions_broken[0]:
-                    X[5, i, j, k] = torch.rand(1)
+                    X[2, i, j, k] = torch.rand(1) * width
                 else:
-                    X[5, i, j, k] = -torch.rand(1)
+                    X[2, i, j, k] = -torch.rand(1) * width
                     
                 # Add a H2 fraction
                 if conditions_broken[1]:
-                    X[1, i, j, k] = H2_crit * torch.rand(1)
+                    X[1, i, j, k] = H2_crit - torch.rand(1) * width
                 else:
-                    X[1, i, j, k] = H2_crit * (torch.rand(1) + 1)
+                    X[1, i, j, k] = H2_crit + torch.rand(1) * width
                     
                 # Add a density
                 if conditions_broken[2]:
-                    X[0, i, j, k] = rho_crit_star * torch.rand(1)
+                    X[0, i, j, k] = rho_crit_star - torch.rand(1) * width
                 else:
-                    X[0, i, j, k] = rho_crit_star * (torch.rand(1) + 1)
+                    X[0, i, j, k] = rho_crit_star + torch.rand(1) * width
         
     return X
     
@@ -262,16 +263,18 @@ def add_compact_objects(X, rhos):
     compact object added to a site is determined by the corresponding rho
     value. 
     """
-    region_size = X.numel()
     num_objects = len(rhos)
+    
+    Nc, Nx, Ny, Nz = X.shape
+    region_size = Nx * Ny * Nz
     
     if num_objects > region_size:
         raise ValueError("Number of objects must be less than region size")
 
     sites = np.random.choice(region_size, size=num_objects, replace=False)
-    site_inds = np.unravel_index(sites, X.shape)
+    site_inds = np.unravel_index(sites, (Nx, Ny, Nz))
     
-    for rho, i, j, k in zip(rhos, site_inds[1], site_inds[2], site_inds[3]):
-        X[5, i, j, k] = -torch.rand(1)
-        X[1, i, j, k] = (torch.rand(1) + 1) * H2_crit
-        X[0, i, j, k] = (torch.rand(1) + 1) * rho
+    for rho, i, j, k in zip(rhos, *site_inds):
+        X[2, i, j, k] = -torch.rand(1) * width
+        X[1, i, j, k] = torch.rand(1) * width + H2_crit
+        X[0, i, j, k] = torch.rand(1) * width + rho

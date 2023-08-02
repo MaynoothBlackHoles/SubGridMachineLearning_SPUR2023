@@ -48,7 +48,7 @@ def train_loop(dataset, model, loss_fn, device, optimizer, correct_list=[], loss
     correct = total_correct / size
     
     print("")
-    print(f"Train Error: \n Accuracy: {(correct):.2f}, Avg loss: {avg_loss:.3f} \n")
+    print(f"Train Error: \n Accuracy: {(correct):.2f}, Avg loss: {avg_loss:.7f} \n")
     correct_list.append(correct)
     loss_list.append(avg_loss)
 	
@@ -86,7 +86,7 @@ def test_loop(dataset, model, loss_fn, device, correct_list=[], loss_list=[]):
     avg_loss =  total_loss / num_batches
     correct = total_correct / size
 
-    print(f"Test Error: \n Accuracy: {(correct):.2f}, Avg loss: {avg_loss:.3f} \n")
+    print(f"Test Error: \n Accuracy: {(correct):.2f}, Avg loss: {avg_loss:.7f} \n")
     correct_list.append(correct)
     loss_list.append(avg_loss)
     

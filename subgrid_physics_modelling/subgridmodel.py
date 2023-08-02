@@ -83,9 +83,9 @@ def check_starForming(tensor):
 # assume a shape (Nc, Nx, Ny, Nz).
 
 # Critical values for this subgrid model.
-H2_crit = 4.2e-6
-rho_crit_star = 15 * 1e2 * 1.6e-30
-rho_crit_BH   = 60 * 1e2 * 1.6e-30
+H2_crit       = 4.2 # in units of 1e-6
+rho_crit_star = 15  # in units of 1.6e-28
+rho_crit_BH   = 60  # in units of 1.6e-28
 
 
 def site_forms_compact_object(X, i, j, k):
