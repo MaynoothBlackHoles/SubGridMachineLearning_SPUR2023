@@ -17,7 +17,7 @@ DATA_DIR = top_dir + "/data/super_resolution"
 from subgrid_physics_modelling import super_resolution_networks as net
 
 # pick names of weights and dataset
-weights_name = "rcnn3d_32_2.pt"
+weights_name = "rcnn3d_1_32_2.pt"
 
 # loading network architecture and saved weights
 print("[INFO] Loading network")

@@ -30,13 +30,30 @@ def batch_classified_data(classified_dataset, batch_size):
     data = []
     classification = []
 
+    print(len(classified_dataset))
+
     for i in range(len(classified_dataset[1])):
-        data.append(classified_dataset[0][i])
-        classification.append(classified_dataset[1][i])
+        
+        # added this bit for super res issue but may mess up previus stuff
+        #######################################################################
+        tensor_shape = list(torch.squeeze(classified_dataset[0][i]).shape)
+        class_num_shape = list(torch.squeeze(classified_dataset[1][i]).shape)
+
+        tensor = torch.reshape(classified_dataset[0][i], (1,*tensor_shape))
+        class_num = torch.reshape(classified_dataset[0][i], (1, *class_num_shape))
+
+        data.append(tensor)
+        classification.append(class_num)
+        ########################################################################
+
+        # un comment this and comment out the above if having issues
+        #data.append(classified_dataset[0][i])
+        #classification.append(classified_dataset[0][i])
 
         if (i+1) % batch_size == 0:
             data = torch.stack(data)
             classification = torch.stack(classification)
+            print(data.shape)
             batched_list.append((data, classification))
             
             data = []

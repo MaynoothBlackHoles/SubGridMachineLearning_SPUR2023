@@ -15,8 +15,8 @@ from subgrid_physics_modelling import data_utils as du
 
 # parameters
 IMAGE_SLICE_SIZE = 32
-SCALE_FACTOR = 2
-BIG_TENSORS = 1 # max = 125
+SCALE_FACTOR = 8
+BIG_TENSORS = 50 # max = 125
 CHANNEL_NUM = 0
 SCALE_DATA = 1e+28
 
@@ -26,7 +26,8 @@ tensors_dict = np.load(DATA_DIR + "/snap_007_tensors.npz")
 tensors_list = []
 tick = 0
 for key in tensors_dict:
-    tensors_list.append(torch.stack([torch.tensor(tensors_dict[key]).permute(3, 0, 1, 2)[CHANNEL_NUM] * SCALE_DATA]))
+    tensors_list.append( torch.stack([(torch.tensor(tensors_dict[key]).permute(3, 0, 1, 2))[CHANNEL_NUM] * SCALE_DATA]))
+    #tensors_list.append(torch.tensor(tensors_dict[key]).permute(3, 0, 1, 2)[:2])
 
     percentage = round(100 * (tick)/BIG_TENSORS, 1)
     print(f"Training: {percentage}%", end="\r")

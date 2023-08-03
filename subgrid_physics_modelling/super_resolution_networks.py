@@ -87,7 +87,7 @@ class Residual_CNN_3D(torch.nn.Module):
 	
 class CNN_3D(torch.nn.Module):
 	def __init__(self, depth=3, channels=6, kernel_front=3, kernel_mid=3, kernel_end=3):
-		super(Residual_CNN_3D, self).__init__()
+		super(CNN_3D, self).__init__()
 
 		self.depth = depth
 

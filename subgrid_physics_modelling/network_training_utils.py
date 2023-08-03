@@ -189,11 +189,7 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], lo
     
     for batch, (x, y) in enumerate(dataset):
 		
-        percentage = round(100 * ((batch + 1)/batches), 1)
-        print(f"Training: {percentage}%", end="\r")
-
         (x, y) = (x.to(device), y.to(device))
-        (x, y) = (torch.squeeze(x), torch.squeeze(y))
 
         prediction = model(x)
         loss = loss_fn(prediction, y)
@@ -205,6 +201,9 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], lo
         loss = loss.item()
         total_loss += loss
         total_metric += metric_func(prediction, y)
+        
+        percentage = round(100 * ((batch + 1)/batches), 1)
+        print(f"Training: {percentage}%", end="\r")
 
     avg_metric = total_metric / batches
     avg_loss = total_loss / batches
@@ -238,11 +237,7 @@ def sr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[], 
     
     for batch, (x, y) in enumerate(dataset):
 		
-        percentage = round(100 * ((batch + 1)/batches), 1)
-        print(f"Testing: {percentage}%", end="\r")
-
         (x, y) = (x.to(device), y.to(device))
-        (x, y) = (torch.squeeze(x), torch.squeeze(y))
 
         prediction = model(x)
         loss = loss_fn(prediction, y)
@@ -250,6 +245,9 @@ def sr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[], 
         loss = loss.item()
         total_loss += loss
         total_metric += metric_func(prediction, y)
+        
+        percentage = round(100 * ((batch + 1)/batches), 1)
+        print(f"Testing: {percentage}%", end="\r")
 
     avg_metric = total_metric / batches
     avg_loss = total_loss / batches

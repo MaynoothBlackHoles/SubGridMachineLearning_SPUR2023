@@ -20,34 +20,35 @@ from subgrid_physics_modelling import data_utils as du
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+SCALE_FACTOR = 8
+CHANNEL_NUM = 0
+SCALE_NUM = 1e+28
+CUBE_LEN = 120 # max is 256
+
+CHANNEL_NUM = 0
+Z_SLICE = 0
+
 # pick names of weights and dataset
-weights_name = "rcnn3d_32_2.pt"
+weights_name = f"rcnn3d_1_32_{SCALE_FACTOR}.pt"
 dataset_name = "snap_007_tensors.npz"
 
 # loading network architecture and saved weights
 print("[INFO] Loading network")
-model = net.Residual_CNN_3D(depth=3, channels=1, kernel_front=9).to(device)
+model = net.CNN_3D(depth=3, channels=1, kernel_front=9).to(device)
 model.load_state_dict(torch.load(DATA_DIR + f"/network_weights/{weights_name}"))
 
 print("[INFO] Loading datasets")
 data = np.load(DATA_DIR + f"/datasets/{dataset_name}")
-sample = data["region 0, 0, 300"] # shape (256,256,256,6)
+sample = data["region 0, 0, 200"] # shape (256,256,256,6)
 sample = torch.tensor(sample).permute(3, 0, 1, 2)
-cube_len = 120
-sample = torch.stack([sample[:,:cube_len,:cube_len,:cube_len][5]])
+sample = torch.stack([sample[CHANNEL_NUM,:CUBE_LEN,:CUBE_LEN,:CUBE_LEN] * SCALE_NUM])
 
-layers = [p for p in model.parameters()] 
-#[torch.Size([64, 1, 9, 9, 9]), torch.Size([64]), torch.Size([64, 64, 3, 3, 3]), torch.Size([64]), torch.Size([1, 64, 3, 3, 3]), torch.Size([1])]
-
-downscaled_img = du.downscale_tensors([sample], 2)
-
-
+downscaled_img = du.downscale_tensors([sample], SCALE_FACTOR)
 init_img = model.init_conv(downscaled_img)
 mid_img = model.mid_conv(init_img)
-residue_img = model.end_conv(mid_img)
-final_img = residue_img + sample
+end_img = model.end_conv(mid_img)
 
-img_list = [sample, downscaled_img, init_img, mid_img, residue_img, final_img]
+img_list = [sample, downscaled_img, init_img, mid_img, end_img]
 
 fig = plt.figure()
 for i, image in enumerate(img_list):
@@ -55,9 +56,9 @@ for i, image in enumerate(img_list):
     image = torch.squeeze(image)
     print(image.shape)
     if len(image.shape) == 4:
-        image = image[0][0]
+        image = image[CHANNEL_NUM][Z_SLICE]
     else:
-        image = image[0]    
+        image = image[Z_SLICE]    
     plt.imshow(image.detach())
     plt.axis("off")
 
