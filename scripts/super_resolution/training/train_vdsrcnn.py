@@ -6,6 +6,7 @@ import torch
 import matplotlib.pyplot as plt
 import time
 import numpy as np
+import torch.nn as nn
 
 import os
 import sys
@@ -26,7 +27,7 @@ EPOCHS        = 20
 BATCH_SIZE    = 128
 
 # dataset features
-BIG_TENSORS      = 1
+BIG_TENSORS      = 50
 IMAGE_SLICE_SIZE = 32
 SCALE_FACTOR     = 2
 
@@ -34,9 +35,9 @@ SCALE_FACTOR     = 2
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.Residual_CNN_3D(depth=6, channels=1, kernel_front=9).to(device)
+model = net.CNN_3D(depth=6, channels=1, kernel_front=9).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-loss_fn = ntu.residual_MSELoss
+loss_fn = nn.MSELoss()
 
 # establishing dataset
 print("[INFO] Loading datasets")
@@ -56,8 +57,8 @@ for i in range(EPOCHS):
     time_start = time.time()
 
     # training, testing and evaluating chosen metric and loss
-    ntu.vdsr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_SSIM)
-    ntu.vdsr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_SSIM)
+    ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_SSIM)
+    ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_SSIM)
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
