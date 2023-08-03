@@ -128,20 +128,25 @@ def test_sliced_data(dataset, model, device):
 
 
 
+def eval_MSE(x, y):
+    MSE = torch.mean(torch.square(x - y))
+    return MSE
+
+
 def eval_PSNR(x, y):
     """
     Function to evaluate the PSNR of two tensors; x, y
     """
-    MSE = torch.mean(torch.square(x - y))
+    MSE = eval_MSE(x, y)
     MAX_I = torch.max(x)
     PSNR = 20*torch.log10(torch.tensor(MAX_I)) - 10*torch.log10(MSE)
     return float(PSNR)
 
 
 
-def test_PSNR(dataset):
+def test_metric(dataset, metric=eval_PSNR):
     """
-    Function to test the PSNR of a dataset which has pairs of tensors one of which has been transformed
+    Function to test the PSNR of a batched dataset which has pairs of tensors one of which has been transformed
 
     return: average PSNR of dataset
     """
@@ -154,7 +159,9 @@ def test_PSNR(dataset):
         percentage = round(100 * ((batch + 1)/batches), 1)
         print(f"Training epoch {percentage}% done", end="\r")
 
-        total_PSNR += eval_PSNR(x, y)
+        x = torch.squeeze(x)
+        x = torch.squeeze(y)
+        total_PSNR += metric(x, y)
 
     avg_PSNR = total_PSNR / batches
     return avg_PSNR
@@ -256,7 +263,7 @@ def residual_MSELoss(x, convoluted_x, y):
 
 
 
-def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss_list=[]):
+def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], loss_list=[], metric_func=eval_PSNR):
     """
     Trains a super resolution network by running through given dataset
 
@@ -290,18 +297,17 @@ def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], lo
         optimizer.step()
 
         total_loss += float(loss)
-        total_PSNR += eval_PSNR(prediction, y)
+        total_PSNR += metric_func(prediction, y)
 
     avg_PSNR = total_PSNR / batches
     avg_loss = total_loss / batches
 
     print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    PSNR_list.append(avg_PSNR)
+    metric_list.append(avg_PSNR)
 
 
-
-def vdsr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
+def vdsr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[],  metric_func=eval_PSNR,):
     """
     Test a super resolution network by running through given dataset
 
@@ -333,11 +339,26 @@ def vdsr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
         loss = loss_fn(x, prediction - x, y)
 
         total_loss += float(loss)
-        total_PSNR += eval_PSNR(prediction, y)
+        total_PSNR += metric_func(prediction, y)
 
     avg_PSNR = total_PSNR / batches
     avg_loss = total_loss / batches
 
     print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    PSNR_list.append(avg_PSNR)
+    metric_list.append(avg_PSNR)
+
+
+
+def eval_SSIM(x, y):
+    mu_x = torch.mean(x)
+    mu_y = torch.mean(y)
+    var_x = torch.var(x)
+    var_y = torch.var(y)
+    cross_corr = torch.sum(torch.mul(x, y))
+
+    L = 2**32 - 1
+    c1 = (0.01 * L)**2
+    c2 = (0.03 * L)**2
+
+    return float((2*mu_x*mu_y + c1)/(mu_x**2 + mu_y**2 + c1) * (2*cross_corr + c2)/(var_x + var_y + c2))

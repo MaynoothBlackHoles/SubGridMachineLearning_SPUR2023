@@ -4,24 +4,24 @@ Script to compare images to their bicubic inertpolation and after run through tr
 
 import torch
 
-import sys
 import os
+import sys
 current_dir = os.getcwd()
-current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
+top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+sys.path.append(top_dir)
+top_dir = top_dir.replace("\\", "/")
 
-parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-parent_dir = parent_dir.replace("\\", "/") 
-sys.path.append(parent_dir)
+DATA_DIR = top_dir + "/data/super_resolution"
 
-from src import sr_networks as net
+from subgrid_physics_modelling import super_resolution_networks as net
 
 # pick names of weights and dataset
 weights_name = "srcnn33_slices_blured.pt"
 
 # loading network architecture and saved weights
 print("[INFO] Loading network")
-model = net.Srcnn()
-model.load_state_dict(torch.load(current_dir + f"/network weights/{weights_name}"))
+model = net.SRcnn()
+model.load_state_dict(torch.load(DATA_DIR + f"/network weights/{weights_name}"))
 
 layers = [p for p in model.parameters()]
 print(layers)

@@ -2,13 +2,15 @@
 Script used to train networks with chosen architecture and datasets
 """
 
-import os
 import sys
-import time
-
+import os
 current_dir = os.getcwd()
-sys.path.append(current_dir + "/../../..")
+current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
+parent_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+parent_dir = parent_dir.replace("\\", "/")
+sys.path.append(parent_dir)
 
+import time
 import torch
 from torch import nn
 import matplotlib.pyplot as plt

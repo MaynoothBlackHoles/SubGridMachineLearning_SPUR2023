@@ -15,6 +15,8 @@ top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
 sys.path.append(top_dir)
 top_dir = top_dir.replace("\\", "/")
 
+DATA_DIR = top_dir + "/data/super_resolution"
+
 # parameters
 IMAGE_SIZE = 500
 SCALE_FACTOR = 8
@@ -58,7 +60,7 @@ def transform_tensors(tensors, transform=transforms.ToTensor()):
 
 # taking out images from the datset and converting them into torch tensors
 print("[INFO] Extracting images")
-tensor_list = extract_tensors(folder_location= current_dir + "/data/flowers-102/jpg", max_size=MAX_EXTRACT)
+tensor_list = extract_tensors(folder_location= Da + "/data/flowers-102/jpg", max_size=MAX_EXTRACT)
 
 # saving and sorting datasets
 print("[INFO] Creating datasets")
