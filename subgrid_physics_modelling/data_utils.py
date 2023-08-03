@@ -165,13 +165,22 @@ def transform_tensors(tensors):
 
 def downscale_tensors(tensors, scale_factor):
     transformed_tensors = []
-    scale = (1, 1/scale_factor, 1/scale_factor, 1/scale_factor)
-    transform = transforms.ToTensor()
 
     for i, tensor in enumerate(tensors):
-        tensor = tensor[0] # funny tensor shape  # temp fix, look for cleaner solution 
-        tensor = zoom(tensor, (1, 1/scale_factor, 1/scale_factor, 1/scale_factor))
-        tensor = zoom(tensor, (1, scale_factor, scale_factor, scale_factor))
+
+        percentage = round(100 * (i)/(len(tensors)), 1)
+        print(f"{percentage}%", end="\r")
+
+        tensor = torch.squeeze(tensor)
+        dim = len(tensor.shape)
+        print(tensor.shape)
+        
+        scale_down = [1/scale_factor] * (dim - 1)
+        scale_up = [scale_factor] * (dim - 1)
+        
+        tensor = zoom(tensor, (1, *scale_down))
+        tensor = zoom(tensor, (1, *scale_up))
         tensor = torch.from_numpy(tensor)
         transformed_tensors.append(tensor)
+
     return torch.stack(transformed_tensors)

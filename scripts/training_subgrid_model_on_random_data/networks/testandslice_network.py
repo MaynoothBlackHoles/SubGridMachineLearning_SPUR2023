@@ -1,10 +1,12 @@
 import torch
 from torch import nn
 import time
+
 import sys
 import os
 current_dir = os.getcwd()
 sys.path.append(current_dir)
+
 from src import subgridmodel as sgm
 from src import network_function as nf
 from src import networks as net

@@ -1,6 +1,14 @@
 import numpy as np
 import plotly.graph_objects as go
 
+import os
+import sys
+current_dir = os.getcwd()
+top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+sys.path.append(top_dir)
+top_dir = top_dir.replace("\\", "/")
+
+DATA_DIR = top_dir + "/data/super_resolution/datasets"
 
 def plot_density(volume_matrix, surface_num=4, opacity=0.1):
     """
@@ -28,14 +36,13 @@ def plot_density(volume_matrix, surface_num=4, opacity=0.1):
     
     fig.show()
 
-# sample volumes
-n = 40
 
-a = np.zeros((n,n,n))
-for i in range(n):
-    a[i, i, i] = 1
+data = np.load(DATA_DIR + "/snap_007_tensors.npz")
 
-b = np.random.randn(n, n, n)
+sample = data["region 0, 0, 300"] # shape (256,256,256,6)
+step = 2**4
+sample = sample[::step,::step,::step,5]
 
-# plotting
-plot_density(b)
+sample = sample / np.linalg.norm(sample) * 50
+
+plot_density(sample)
