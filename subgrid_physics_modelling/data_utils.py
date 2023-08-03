@@ -173,7 +173,6 @@ def downscale_tensors(tensors, scale_factor):
 
         tensor = torch.squeeze(tensor)
         dim = len(tensor.shape)
-        print(tensor.shape)
         
         scale_down = [1/scale_factor] * (dim - 1)
         scale_up = [scale_factor] * (dim - 1)

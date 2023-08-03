@@ -75,12 +75,42 @@ class Residual_CNN_3D(torch.nn.Module):
 			)
 
 	def forward(self, x):
-		r = self.init_conv(x)
+		x = self.init_conv(x)
 
 		for i in range(self.depth - 2):
-			r = self.mid_conv(r)
+			x = self.mid_conv(x)
 
-		r = self.end_conv(r)
+		x = self.end_conv(x)
 		
-		y = r + x
+		y = x + x
 		return y
+	
+class CNN_3D(torch.nn.Module):
+	def __init__(self, depth=3, channels=6, kernel_front=3, kernel_mid=3, kernel_end=3):
+		super(Residual_CNN_3D, self).__init__()
+
+		self.depth = depth
+
+		self.init_conv = nn.Sequential(
+			nn.Conv3d(in_channels=channels, out_channels=64, kernel_size=kernel_front, padding=kernel_front//2),
+			nn.ReLU(),
+			)
+		
+		self.mid_conv = nn.Sequential(
+			nn.Conv3d(in_channels=64, out_channels=64, kernel_size=kernel_mid, padding=kernel_mid//2),
+			nn.ReLU(),
+			)
+		
+		self.end_conv = nn.Sequential(
+			nn.Conv3d(in_channels=64, out_channels=channels, kernel_size=kernel_end, padding=kernel_end//2),
+			)
+
+	def forward(self, x):
+		x = self.init_conv(x)
+
+		for i in range(self.depth - 2):
+			x = self.mid_conv(x)
+
+		x = self.end_conv(x)
+		
+		return x

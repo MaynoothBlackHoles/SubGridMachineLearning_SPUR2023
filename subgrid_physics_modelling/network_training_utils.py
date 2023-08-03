@@ -168,7 +168,7 @@ def test_metric(dataset, metric=eval_PSNR):
 
 
 
-def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss_list=[]):
+def sr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], loss_list=[], metric_func=eval_PSNR):
     """
     Trains a super resolution network by running through given dataset
 
@@ -203,18 +203,18 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, PSNR_list=[], loss
 
         loss = loss.item()
         total_loss += loss
-        total_PSNR += eval_PSNR(prediction, y)
+        total_PSNR += metric_func(prediction, y)
 
     avg_PSNR = total_PSNR / batches
     avg_loss = total_loss / batches
 
     print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    PSNR_list.append(avg_PSNR)
+    metric_list.append(avg_PSNR)
 
 
 
-def sr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
+def sr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[], metric_func=eval_PSNR):
     """
     Test a super resolution network by running through given dataset
 
@@ -247,14 +247,14 @@ def sr_test_loop(dataset, model, loss_fn, device, PSNR_list=[], loss_list=[]):
 
         loss = loss.item()
         total_loss += loss
-        total_PSNR += eval_PSNR(prediction, y)
+        total_PSNR += metric_func(prediction, y)
 
     avg_PSNR = total_PSNR / batches
     avg_loss = total_loss / batches
 
     print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    PSNR_list.append(avg_PSNR)
+    metric_list.append(avg_PSNR)
 
 
 
@@ -307,7 +307,7 @@ def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], 
     metric_list.append(avg_PSNR)
 
 
-def vdsr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[],  metric_func=eval_PSNR,):
+def vdsr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[],  metric_func=eval_PSNR):
     """
     Test a super resolution network by running through given dataset
 
