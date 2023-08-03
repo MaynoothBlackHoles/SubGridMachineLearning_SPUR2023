@@ -16,6 +16,7 @@ top_dir = top_dir.replace("\\", "/")
 DATA_DIR = top_dir + "/data/super_resolution"
 
 from subgrid_physics_modelling import super_resolution_networks as net
+from subgrid_physics_modelling import data_utils as du
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -38,12 +39,15 @@ sample = torch.stack([sample[:,:cube_len,:cube_len,:cube_len][5]])
 layers = [p for p in model.parameters()] 
 #[torch.Size([64, 1, 9, 9, 9]), torch.Size([64]), torch.Size([64, 64, 3, 3, 3]), torch.Size([64]), torch.Size([1, 64, 3, 3, 3]), torch.Size([1])]
 
-init_img = model.init_conv(sample)
+downscaled_img = du.downscale_tensors([sample], 2)
+
+
+init_img = model.init_conv(downscaled_img)
 mid_img = model.mid_conv(init_img)
 residue_img = model.end_conv(mid_img)
 final_img = residue_img + sample
 
-img_list = [sample, init_img, mid_img, residue_img, final_img]
+img_list = [sample, downscaled_img, init_img, mid_img, residue_img, final_img]
 
 fig = plt.figure()
 for i, image in enumerate(img_list):

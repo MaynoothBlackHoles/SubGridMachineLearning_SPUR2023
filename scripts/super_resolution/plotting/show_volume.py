@@ -27,7 +27,7 @@ dataset_name = "snap_007_tensors.npz"
 # loading network architecture and saved weights
 print("[INFO] Loading network")
 model = net.Residual_CNN_3D(channels=1, kernel_front=9).to(device)
-model.load_state_dict(torch.load(DATA_DIR + f"/network weights/{weights_name}"))
+model.load_state_dict(torch.load(DATA_DIR + f"/network_weights/{weights_name}"))
 
 print("[INFO] Loading datasets")
 data = np.load(DATA_DIR + f"/datasets/{dataset_name}")
@@ -36,7 +36,7 @@ sample = torch.tensor(sample).permute(3, 0, 1, 2)
 cube_len = 80
 sample = sample[:,:cube_len,:cube_len,:cube_len]
 
-low_res_tensor = du.downscale_tensors([sample], 2)[0][5]
+low_res_tensor = du.downscale_tensors([sample], 8)[0][5]
 high_res_tensor = sample[5]
 srcnn_tensor = model(torch.stack([low_res_tensor]))
 

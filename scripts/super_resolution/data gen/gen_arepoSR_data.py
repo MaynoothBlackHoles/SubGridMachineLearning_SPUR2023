@@ -16,7 +16,7 @@ from subgrid_physics_modelling import data_utils as du
 # parameters
 IMAGE_SLICE_SIZE = 32
 SCALE_FACTOR = 2
-BIG_TENSORS = 125 # max = 125
+BIG_TENSORS = 1 # max = 125
 CHANNEL_NUM = 0
 SCALE_DATA = 1e+28
 

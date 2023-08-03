@@ -42,7 +42,6 @@ srcnn_tensor = model(low_res_tensor)
 
 img_list = [low_res_tensor, high_res_tensor, srcnn_tensor]
 
-
 fig = plt.figure()
 for i, image in enumerate(img_list):
     fig.add_subplot(1, 3, i+1)

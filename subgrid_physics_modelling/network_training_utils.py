@@ -160,7 +160,7 @@ def test_metric(dataset, metric=eval_PSNR):
         print(f"Training epoch {percentage}% done", end="\r")
 
         x = torch.squeeze(x)
-        x = torch.squeeze(y)
+        y = torch.squeeze(y)
         total_PSNR += metric(x, y)
 
     avg_PSNR = total_PSNR / batches
@@ -183,7 +183,7 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], lo
     """
 
     total_loss = 0
-    total_PSNR = 0
+    total_metric = 0
         
     batches = (len(dataset))
     
@@ -193,6 +193,7 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], lo
         print(f"Training: {percentage}%", end="\r")
 
         (x, y) = (x.to(device), y.to(device))
+        (x, y) = (torch.squeeze(x), torch.squeeze(y))
 
         prediction = model(x)
         loss = loss_fn(prediction, y)
@@ -203,14 +204,14 @@ def sr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], lo
 
         loss = loss.item()
         total_loss += loss
-        total_PSNR += metric_func(prediction, y)
+        total_metric += metric_func(prediction, y)
 
-    avg_PSNR = total_PSNR / batches
+    avg_metric = total_metric / batches
     avg_loss = total_loss / batches
 
-    print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
+    print(f"Train Error: \n Average PSNR: {(avg_metric):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    metric_list.append(avg_PSNR)
+    metric_list.append(avg_metric)
 
 
 
@@ -231,7 +232,7 @@ def sr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[], 
     model.eval()
 
     total_loss = 0
-    total_PSNR = 0
+    total_metric = 0
         
     batches = (len(dataset))
     
@@ -241,20 +242,21 @@ def sr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[], 
         print(f"Testing: {percentage}%", end="\r")
 
         (x, y) = (x.to(device), y.to(device))
+        (x, y) = (torch.squeeze(x), torch.squeeze(y))
 
         prediction = model(x)
         loss = loss_fn(prediction, y)
 
         loss = loss.item()
         total_loss += loss
-        total_PSNR += metric_func(prediction, y)
+        total_metric += metric_func(prediction, y)
 
-    avg_PSNR = total_PSNR / batches
+    avg_metric = total_metric / batches
     avg_loss = total_loss / batches
 
-    print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
+    print(f"Test Error: \n Average PSNR: {(avg_metric):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    metric_list.append(avg_PSNR)
+    metric_list.append(avg_metric)
 
 
 
