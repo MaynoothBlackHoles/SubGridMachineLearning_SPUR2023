@@ -163,7 +163,7 @@ def classified_data_slicer(classified_data, output_lenght):
 
 
 
-def sr_data_slicer(tensor_list, output_lenght, tensor_slicer=tensor_slicer_2d):
+def sr_data_slicer(tensor_list, output_lenght, tensor_slicer=tensor_slicer_2d, add_dim=False):
     """
     Creates a new dataset which takes in a list of tensors with a list of slices from each tensor
 
@@ -173,6 +173,8 @@ def sr_data_slicer(tensor_list, output_lenght, tensor_slicer=tensor_slicer_2d):
     """
     sliced_tensors = []
     for i, tensor in enumerate(tensor_list):
+        if add_dim:
+            tensor = torch.stack([tensor])
         sliced_tensor = tensor_slicer(tensor, output_lenght)
         sliced_tensors.extend(sliced_tensor)
 
