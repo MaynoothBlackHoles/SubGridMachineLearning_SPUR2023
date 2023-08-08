@@ -27,15 +27,19 @@ EPOCHS        = 20
 BATCH_SIZE    = 32
 
 # dataset features
-BIG_TENSORS      = 50
-IMAGE_SLICE_SIZE = 32
 SCALE_FACTOR     = 8
+IMAGE_SLICE_SIZE = 32
+BIG_TENSORS      = 125
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.CNN_3D(depth=3, channels=1, kernel_front=9).to(device)
+model = net.CNN_3D(depth        = 3,
+                   channels     = 1,
+                   mid_channels = 16,
+                   kernel_front = 9
+                   ).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
@@ -43,12 +47,12 @@ loss_fn = nn.MSELoss()
 print("[INFO] Loading datasets")
 dataset = torch.load(DATA_DIR +  f"/datasets/dataset_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
 print("[INFO] Batching Data")
-dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE)
-dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_SIZE)
+dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
+dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_SIZE, pytorch_hijinks=True)
 
 # stats to store values
 stats = {"train metric": [], "train loss": [], "test metric": [], "test loss": []}
-metric_name = "SSIM"
+metric_name = "PSNR"
 
 print("[INFO] Training Network")
 epoch_num = 0
@@ -58,8 +62,8 @@ for i in range(EPOCHS):
     time_start = time.time()
 
     # training, testing and evaluating chosen metric and loss
-    ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_SSIM)
-    ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_SSIM)
+    ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_PSNR)
+    ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_PSNR)
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
@@ -83,7 +87,7 @@ for i in range(EPOCHS):
     plt.ylabel("Loss")
     plt.xlabel("Epoch")
 
-    plt.savefig(DATA_DIR + "/plots/plot_cnn")
+    plt.savefig(DATA_DIR + f"/plots/plot_cnn_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}")
 
     # saving model network weights each epoch
     torch.save(model.state_dict(), DATA_DIR + f"/network_weights/rcnn3d_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
