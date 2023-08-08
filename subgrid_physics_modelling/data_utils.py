@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import torch
-import torchvision.transforms.v2 as transforms
+import numpy as np
 
 from .subgridmodel import check_starForming
 from scipy.ndimage import zoom
@@ -18,49 +18,58 @@ def classify_dataset(dataset):
 
 
 
-def batch_classified_data(classified_dataset, batch_size):
+def batch_classified_data(classified_dataset, batch_size, pytorch_hijinks=False):
     """
     Takes in a classified dataset and makes a new list which contains batches of data.
 
      Variables
-    classified_datset: a classified datset which is a list with two entries. The first entry a list of tensors for the network to be trained on. The second entry a list of classifications corresponding in entry number to the previous list of tensors.
+    classified_datset: a classified datset which is a list with two entries. The first entry is
+    a list of tensors for the network to be trained on. The second entry a list of classifications 
+    corresponding in entry number to the previous list of tensors.
     batch_size: desired size of batches
+
     """
     batched_list = []
     data = []
     classification = []
 
-    print(len(classified_dataset))
-
-    for i in range(len(classified_dataset[1])):
-        
-        # added this bit for super res issue but may mess up previus stuff
-        #######################################################################
-        tensor_shape = list(torch.squeeze(classified_dataset[0][i]).shape)
-        class_num_shape = list(torch.squeeze(classified_dataset[1][i]).shape)
-
-        tensor = torch.reshape(classified_dataset[0][i], (1,*tensor_shape))
-        class_num = torch.reshape(classified_dataset[0][i], (1, *class_num_shape))
-
-        data.append(tensor)
-        classification.append(class_num)
-        ########################################################################
-
-        # un comment this and comment out the above if having issues
-        #data.append(classified_dataset[0][i])
-        #classification.append(classified_dataset[0][i])
-
-        if (i+1) % batch_size == 0:
-            data = torch.stack(data)
-            classification = torch.stack(classification)
-            print(data.shape)
-            batched_list.append((data, classification))
+    if pytorch_hijinks:
+        for i in range(len(classified_dataset[1])):
             
-            data = []
-            classification = []
-        
-    return batched_list
+            tensor_shape = list(torch.squeeze(classified_dataset[0][i]).shape)
+            class_num_shape = list(torch.squeeze(classified_dataset[1][i]).shape)
 
+            tensor = torch.reshape(classified_dataset[0][i], (1,*tensor_shape))
+            class_num = torch.reshape(classified_dataset[0][i], (1, *class_num_shape))
+
+            data.append(tensor)
+            classification.append(class_num)
+
+            if (i+1) % batch_size == 0:
+                data = torch.stack(data)
+                classification = torch.stack(classification)
+                batched_list.append((data, classification))
+                
+                data = []
+                classification = []
+            
+        return batched_list
+
+    else:
+        for i in range(len(classified_dataset[1])):
+            
+            data.append(classified_dataset[0][i])
+            classification.append(classified_dataset[1][i])
+
+            if (i+1) % batch_size == 0:
+                data = torch.stack(data)
+                classification = torch.stack(classification)
+                batched_list.append((data, classification))
+                
+                data = []
+                classification = []
+            
+        return batched_list
 
 
 def star_forming_ratio(classified_dataset):
@@ -169,18 +178,13 @@ def sr_data_slicer(tensor_list, output_lenght, tensor_slicer=tensor_slicer_2d):
 
     return sliced_tensors
 
-
-
-def transform_tensors(tensors):
-    transformed_tensors = []
-    for i, tensor in enumerate(tensors):
-        tensor = torch.from_numpy(tensor)
-        transformed_tensors.append(tensor)
-    return torch.stack(transformed_tensors)
-
-
-
-def downscale_tensors(tensors, scale_factor):
+def rescale_tensors(tensors, scale_factor):
+    """
+    Takes a list of tensors, scales them down and back up and returns a list of those scaled tensors
+    
+    tensors: list of tensors
+    scale_factor: number to scale the tensors
+    """
     transformed_tensors = []
 
     for i, tensor in enumerate(tensors):
@@ -189,13 +193,9 @@ def downscale_tensors(tensors, scale_factor):
         print(f"{percentage}%", end="\r")
 
         tensor = torch.squeeze(tensor)
-        dim = len(tensor.shape)
         
-        scale_down = [1/scale_factor] * (dim - 1)
-        scale_up = [scale_factor] * (dim - 1)
-        
-        tensor = zoom(tensor, (1, *scale_down))
-        tensor = zoom(tensor, (1, *scale_up))
+        tensor = zoom(tensor, 1/scale_factor) 
+        tensor = zoom(tensor, scale_factor)
         tensor = torch.from_numpy(tensor)
         transformed_tensors.append(tensor)
 

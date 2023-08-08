@@ -41,8 +41,7 @@ data = np.load(DATA_DIR + "/snap_007_tensors.npz")
 
 sample = data["region 0, 0, 300"] # shape (256,256,256,6)
 step = 2**4
-sample = sample[::step,::step,::step,5]
-
-sample = sample / np.linalg.norm(sample) * 50
+sample = sample[::step,::step,::step,0] * 1e+28 
+sample = sample / np.linalg.norm(sample) * 10
 
 plot_density(sample)
