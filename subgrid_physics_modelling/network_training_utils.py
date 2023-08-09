@@ -142,7 +142,13 @@ def eval_PSNR(x, y):
     PSNR = 20*torch.log10(torch.tensor(MAX_I)) - 10*torch.log10(MSE)
     return float(PSNR)
 
-
+def eval_logMSE(x, y):
+    """
+    Function to evaluate the PSNR of two tensors; x, y
+    """
+    MSE = eval_MSE(x, y)
+    PSNR =  - 10*torch.log10(MSE)
+    return float(PSNR)
 
 def test_metric(dataset, metric=eval_PSNR):
     """
@@ -157,7 +163,7 @@ def test_metric(dataset, metric=eval_PSNR):
     
     for batch, (x, y) in enumerate(dataset):
         percentage = round(100 * ((batch + 1)/batches), 1)
-        print(f"Training epoch {percentage}% done", end="\r")
+        print(f"{percentage}%", end="\r")
 
         x = torch.squeeze(x)
         y = torch.squeeze(y)

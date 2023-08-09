@@ -182,7 +182,7 @@ def sr_data_slicer(tensor_list, output_lenght, tensor_slicer=tensor_slicer_2d, a
 
 def rescale_tensors(tensors, scale_factor):
     """
-    Takes a list of tensors, scales them down and back up and returns a list of those scaled tensors
+    Takes a list of tensors, scales them down and back up to their original size and returns a list of those scaled tensors
     
     tensors: list of tensors
     scale_factor: number to scale the tensors
