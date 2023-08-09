@@ -22,8 +22,8 @@ from subgrid_physics_modelling import super_resolution_networks as net
 from subgrid_physics_modelling import synthetic_data_generation as sdg
 
 # hyperparameters
-LEARNING_RATE = 1e-3
-EPOCHS        = 20
+LEARNING_RATE = 1e-4
+EPOCHS        = 40
 BATCH_SIZE    = 32
 
 # dataset features
@@ -52,18 +52,22 @@ dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_S
 
 # stats to store values
 stats = {"train metric": [], "train loss": [], "test metric": [], "test loss": []}
-metric_name = "PSNR"
+metric_name = "logMSE"
 
 print("[INFO] Training Network")
 epoch_num = 0
 for i in range(EPOCHS):
+    if (i+1) % 10 == 0:
+        LEARNING_RATE = LEARNING_RATE * 1e-1
+        optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+
     epoch_num += 1
     print(f"[INFO] Epoch {i + 1} ---------------------------")
     time_start = time.time()
 
     # training, testing and evaluating chosen metric and loss
-    ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_PSNR)
-    ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_PSNR)
+    ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
+    ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_logMSE)
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")

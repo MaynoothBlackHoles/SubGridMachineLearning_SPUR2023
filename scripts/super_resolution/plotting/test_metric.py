@@ -25,25 +25,15 @@ bicubic_data = sdg.batch_classified_data(classified_dataset=test_data["training"
 
 # testing on loaded dataset
 data_SSIM = ntu.test_metric(bicubic_data, metric=ntu.eval_SSIM)
-data_MSE = ntu.test_metric(bicubic_data, metric=ntu.eval_MSE)
-
+data_PSNR = ntu.test_metric(bicubic_data, metric=ntu.eval_PSNR)
 
 print("-----------------------------")
-print(data_SSIM) # 1
-print(float(data_MSE)) # 1.6e-5
+print(data_SSIM)
+print(data_PSNR)
 
 
 """
-##################
-#    garbage     #
-##################
-logSSIM sf2 = 5.6
-logSSIM sf4 = 9.027
-logSSIM sf16 = 8.9
-
-for scalefactor of 2: PSNR = 29.3
-for scalefactor of 3: PSNR = 27.3
-for scalefactor of 4: PSNR = 25.2
-for scalefactor of 8: PSNR = 8.84
-
+sf 4: psnr 65
+sf 8: psnr 54
+sf 16: psnr 44
 """
