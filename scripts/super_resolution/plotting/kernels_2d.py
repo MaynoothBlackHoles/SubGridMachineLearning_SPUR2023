@@ -21,7 +21,7 @@ weights_name = "srcnn33_slices_blured.pt"
 # loading network architecture and saved weights
 print("[INFO] Loading network")
 model = net.SRcnn()
-model.load_state_dict(torch.load(DATA_DIR + f"/network weights/{weights_name}"))
+model.load_state_dict(torch.load(DATA_DIR + f"/network_weights/{weights_name}"))
 
 layers = [p for p in model.parameters()]
 print(layers)
