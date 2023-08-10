@@ -33,6 +33,10 @@ print(data_PSNR)
 
 
 """
+sf 8: logmse 32
+sf 16: logmse 22
+
+
 sf 4: psnr 65
 sf 8: psnr 54
 sf 16: psnr 44

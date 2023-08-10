@@ -17,11 +17,11 @@ DATA_DIR = top_dir + "/data/super_resolution"
 from subgrid_physics_modelling import super_resolution_networks as net
 
 # pick names of weights and dataset
-weights_name = "rcnn3d_50_32_8.pt"
+weights_name = "rcnn3d_125_32_8.pt"
 
 # loading network architecture and saved weights
 print("[INFO] Loading network")
-model = net.CNN_3D(channels=1, kernel_front=9, mid_channels=64)
+model = net.CNN_3D(channels=1, kernel_front=9, mid_channels=16)
 model.load_state_dict(torch.load(DATA_DIR + f"/network_weights/{weights_name}"))
 
 layers = [p for p in model.parameters()]
@@ -30,7 +30,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 n, m = 4, 4 
-shift = n*m * 3
+shift = n*m * 0
 index = np.arange(shift, n*m + shift).reshape((n, m))
 fig = make_subplots(rows=n, cols=m, specs=[ [{"type": "volume"}] * m] * n)
 

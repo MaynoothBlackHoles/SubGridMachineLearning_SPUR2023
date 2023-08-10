@@ -22,14 +22,14 @@ from subgrid_physics_modelling import super_resolution_networks as net
 from subgrid_physics_modelling import synthetic_data_generation as sdg
 
 # hyperparameters
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-2
 EPOCHS        = 40
 BATCH_SIZE    = 32
 
 # dataset features
 SCALE_FACTOR     = 8
 IMAGE_SLICE_SIZE = 32
-BIG_TENSORS      = 125
+BIG_TENSORS      = 1
 
 bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 
@@ -37,12 +37,24 @@ bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.CNN_3D(depth        = 3,
-                   channels     = 1,
-                   mid_channels = 16,
-                   kernel_front = 9
-                   ).to(device)
-optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
+model = net.CNN_3D(channels=1, mid_channels=32, kernel_front=3)
+
+new_dict = {}
+for param_tensor in model.state_dict():
+    #print(param_tensor, "\t", model.state_dict()[param_tensor].size())
+
+    shape = model.state_dict()[param_tensor].size()
+    tuple_shape = tuple(shape)
+    identity_maps = torch.zeros(*tuple_shape,)
+    if len(shape) > 1:
+        for i in range(tuple_shape[0]):
+            for j in range(tuple_shape[1]): 
+                identity_maps[i, j, 1, 1 ,1] = 1
+
+    new_dict[param_tensor] = identity_maps
+
+model.load_state_dict(new_dict)
+optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
 # establishing dataset
@@ -59,10 +71,6 @@ metric_name = "logMSE"
 print("[INFO] Training Network")
 epoch_num = 0
 for i in range(EPOCHS):
-    if (i+1) % 10 == 0:
-        LEARNING_RATE = LEARNING_RATE * 1e-1
-        optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
     epoch_num += 1
     print(f"[INFO] Epoch {i + 1} ---------------------------")
     time_start = time.time()
@@ -70,7 +78,7 @@ for i in range(EPOCHS):
     # training, testing and evaluating chosen metric and loss
     ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
     ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_logMSE)
-    
+
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
@@ -85,7 +93,6 @@ for i in range(EPOCHS):
     plt.plot(epochs_list, stats[f"train metric"], label="train", color="green")
     plt.plot(epochs_list, stats["test metric"], label="test", color="red")
     plt.plot(epochs_list, ones_list * bicubic_logmse[f"sf {SCALE_FACTOR}"], label="test", color="red")
-
     plt.ylabel(metric_name)
     plt.legend()
 
