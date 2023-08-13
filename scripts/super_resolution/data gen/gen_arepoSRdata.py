@@ -14,9 +14,9 @@ DATA_DIR = top_dir + "/data/super_resolution/datasets"
 from subgrid_physics_modelling import data_utils as du
 
 # parameters
-SCALE_FACTOR = 8
+SCALE_FACTOR = 16
 IMAGE_SLICE_SIZE = 32 # keep the scale factor as a multiple of the scale factor
-BIG_TENSORS = 1 # max = 125
+BIG_TENSORS = 5 # max = 125
 CHANNEL_NUM = 0
 SCALE_DATA = 1e+28
 
@@ -34,7 +34,6 @@ for key in tensors_dict:
     tick += 1
     if tick == BIG_TENSORS:
         break
-
 
 print("[INFO] Creating datasets")
 sliced_tensor_list = du.sr_data_slicer(tensors_list, IMAGE_SLICE_SIZE, tensor_slicer=du.tensor_slicer_3d, add_dim=True)
