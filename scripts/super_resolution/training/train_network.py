@@ -61,15 +61,11 @@ metric_name = "logMSE"
 print("[INFO] Training Network")
 epoch_num = 0
 for i in range(EPOCHS):
-    """if (i+1) % 20 == 0:
-        LEARNING_RATE = LEARNING_RATE * 1e-1
-        optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
-"""
     epoch_num += 1
     print(f"[INFO] Epoch {i + 1} ---------------------------")
     time_start = time.time()
 
-    print("shuffling training data")
+    print("Shuffling training data")
     training_data = dataset_copy["training"]
     scaled, origial = training_data[0], training_data[1]
 

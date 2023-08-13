@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import time
 import numpy as np
 import torch.nn as nn
+import random
 
 import os
 import sys
@@ -22,14 +23,14 @@ from subgrid_physics_modelling import super_resolution_networks as net
 from subgrid_physics_modelling import synthetic_data_generation as sdg
 
 # hyperparameters
-LEARNING_RATE = 1e-2
+LEARNING_RATE = 1e-3
 EPOCHS        = 40
 BATCH_SIZE    = 32
 
 # dataset features
 SCALE_FACTOR     = 8
 IMAGE_SLICE_SIZE = 32
-BIG_TENSORS      = 1
+BIG_TENSORS      = 5
 
 bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 
@@ -37,7 +38,7 @@ bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.CNN_3D(depth=6, channels=1, mid_channels=32, kernel_front=3)
+model = net.CNN_3D(depth=3, channels=1, mid_channels=32, kernel_front=3)
 
 new_dict = {}
 for param_tensor in model.state_dict():
@@ -49,33 +50,20 @@ for param_tensor in model.state_dict():
     if len(shape) > 1:
         for i in range(tuple_shape[0]):
             for j in range(tuple_shape[1]): 
-                identity_maps[i, j, 1, 1 ,1] = 1/18
+                identity_maps[i, j, 1, 1 ,1] = 1/10
 
     new_dict[param_tensor] = identity_maps
 
 model.load_state_dict(new_dict)
-
-for param_tensor in model.state_dict():
-    print(param_tensor, "\t", model.state_dict()[param_tensor])
-
-
-print("------------------------------------------------------")
-random_tensor = torch.ones(1,3,3,3)
-print(model(random_tensor))
-#print(torch.sum(model(torch.ones(1,3,3,3)) - torch.ones(1,3,3,3)))
-
-
-
-
-"""
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
 # establishing dataset
 print("[INFO] Loading datasets")
 dataset = torch.load(DATA_DIR +  f"/datasets/dataset_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
+dataset_copy = dataset
 print("[INFO] Batching Data")
-dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
+#dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
 dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_SIZE, pytorch_hijinks=True)
 
 # stats to store values
@@ -88,6 +76,18 @@ for i in range(EPOCHS):
     epoch_num += 1
     print(f"[INFO] Epoch {i + 1} ---------------------------")
     time_start = time.time()
+
+    print("Shuffling training data")
+    training_data = dataset_copy["training"]
+    scaled, origial = training_data[0], training_data[1]
+
+    c = list(zip(scaled, origial))
+    random.shuffle(c)
+    scaled, origial = zip(*c)
+
+    dataset["training"] = [scaled, origial]
+    print("Batching Data")
+    dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
 
     # training, testing and evaluating chosen metric and loss
     ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
@@ -122,4 +122,4 @@ for i in range(EPOCHS):
     torch.save(model.state_dict(), DATA_DIR + f"/network_weights/rcnn3d_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
     
 print("[INFO] Done! :D")
-plt.show()"""
+plt.show()
