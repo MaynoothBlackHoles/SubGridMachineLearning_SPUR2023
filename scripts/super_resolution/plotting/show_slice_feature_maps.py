@@ -21,15 +21,15 @@ from subgrid_physics_modelling import network_training_utils as ntu
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-SCALE_FACTOR = 8
+SCALE_FACTOR = 16
 SCALE_NUM = 1e+28
 TENSOR_CHANNEL = 0 
-CUBE_LEN = 128 # max is 256 # keep the scalefactor as a multiple of this number to get matching size for rescaled image
+CUBE_LEN = 32 # max is 256 # keep the scalefactor as a multiple of this number to get matching size for rescaled image
 CHANNEL_NUM = 2
 Z_SLICE = 0
 
 # pick names of weights and dataset
-weights_name = f"rcnn3d_10_32_8.pt"
+weights_name = f"idrcnn3d_5_32_8.pt"
 dataset_name = "snap_007_tensors.npz"
 
 # loading network architecture and saved weights
@@ -39,7 +39,7 @@ model.load_state_dict(torch.load(DATA_DIR + f"/network_weights/{weights_name}"))
 
 print("[INFO] Loading datasets")
 data = np.load(DATA_DIR + f"/datasets/{dataset_name}")
-sample = data["region 0, 100, 0"] # shape (256,256,256,6)
+sample = data["region 100, 200, 0"] # shape (256,256,256,6)
 sample = torch.tensor(sample).permute(3, 0, 1, 2)
 sample = torch.stack([sample[TENSOR_CHANNEL, :CUBE_LEN, :CUBE_LEN, :CUBE_LEN] * SCALE_NUM])
 
@@ -64,11 +64,12 @@ def plot_figs(name, tensors_list):
 
         
         if len(image.shape) == 4:
-            image = image[CHANNEL_NUM,Z_SLICE, 10:-10, 10:-10]
+            image = image[CHANNEL_NUM,Z_SLICE]#, 10:-10, 10:-10]
         else:
-            image = image[Z_SLICE, 10:-10, 10:-10]  
+            image = image[Z_SLICE]#, 10:-10, 10:-10]  
         
-        psnr = round(ntu.eval_PSNR(sample[0][Z_SLICE][10:-10 ,10:-10], image), 2)
+        #psnr = round(ntu.eval_logMSE(sample[0][Z_SLICE][10:-10 ,10:-10], image), 2)
+        psnr = round(ntu.eval_logMSE(sample[0][Z_SLICE], image), 2)
         
         plt.imshow(image.detach())
         plt.axis("off")

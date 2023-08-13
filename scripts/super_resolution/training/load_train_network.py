@@ -37,7 +37,7 @@ bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.CNN_3D(channels=1, mid_channels=32, kernel_front=3)
+model = net.CNN_3D(depth=6, channels=1, mid_channels=32, kernel_front=3)
 
 new_dict = {}
 for param_tensor in model.state_dict():
@@ -49,11 +49,25 @@ for param_tensor in model.state_dict():
     if len(shape) > 1:
         for i in range(tuple_shape[0]):
             for j in range(tuple_shape[1]): 
-                identity_maps[i, j, 1, 1 ,1] = 1
+                identity_maps[i, j, 1, 1 ,1] = 1/18
 
     new_dict[param_tensor] = identity_maps
 
 model.load_state_dict(new_dict)
+
+for param_tensor in model.state_dict():
+    print(param_tensor, "\t", model.state_dict()[param_tensor])
+
+
+print("------------------------------------------------------")
+random_tensor = torch.ones(1,3,3,3)
+print(model(random_tensor))
+#print(torch.sum(model(torch.ones(1,3,3,3)) - torch.ones(1,3,3,3)))
+
+
+
+
+"""
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
@@ -78,7 +92,6 @@ for i in range(EPOCHS):
     # training, testing and evaluating chosen metric and loss
     ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
     ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_logMSE)
-
 
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
@@ -109,4 +122,4 @@ for i in range(EPOCHS):
     torch.save(model.state_dict(), DATA_DIR + f"/network_weights/rcnn3d_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
     
 print("[INFO] Done! :D")
-plt.show()
+plt.show()"""

@@ -6,6 +6,7 @@ import torch
 import matplotlib.pyplot as plt
 import time
 import numpy as np
+import random
 import torch.nn as nn
 
 import os
@@ -23,13 +24,13 @@ from subgrid_physics_modelling import synthetic_data_generation as sdg
 
 # hyperparameters
 LEARNING_RATE = 1e-4
-EPOCHS        = 40
+EPOCHS        = 100
 BATCH_SIZE    = 32
 
 # dataset features
 SCALE_FACTOR     = 8
 IMAGE_SLICE_SIZE = 32
-BIG_TENSORS      = 125
+BIG_TENSORS      = 5
 
 bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 
@@ -42,14 +43,15 @@ model = net.CNN_3D(depth        = 3,
                    mid_channels = 16,
                    kernel_front = 9
                    ).to(device)
-optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
+optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
 # establishing dataset
 print("[INFO] Loading datasets")
 dataset = torch.load(DATA_DIR +  f"/datasets/dataset_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
+dataset_copy = dataset
 print("[INFO] Batching Data")
-dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
+#dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
 dataset["validation"] = sdg.batch_classified_data(dataset["validation"], BATCH_SIZE, pytorch_hijinks=True)
 
 # stats to store values
@@ -59,19 +61,31 @@ metric_name = "logMSE"
 print("[INFO] Training Network")
 epoch_num = 0
 for i in range(EPOCHS):
-    if (i+1) % 10 == 0:
+    """if (i+1) % 20 == 0:
         LEARNING_RATE = LEARNING_RATE * 1e-1
-        optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
+        optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
+"""
     epoch_num += 1
     print(f"[INFO] Epoch {i + 1} ---------------------------")
     time_start = time.time()
+
+    print("shuffling training data")
+    training_data = dataset_copy["training"]
+    scaled, origial = training_data[0], training_data[1]
+
+    c = list(zip(scaled, origial))
+    random.shuffle(c)
+    scaled, origial = zip(*c)
+
+    dataset["training"] = [scaled, origial]
+
+    print("Batching Data")
+    dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
 
     # training, testing and evaluating chosen metric and loss
     ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
     ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_logMSE)
     
-
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
 

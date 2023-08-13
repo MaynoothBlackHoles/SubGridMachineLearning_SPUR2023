@@ -235,25 +235,6 @@ class S1_simple(torch.nn.Module):
 
 
 
-class Srcnn(torch.nn.Module):
-	def __init__(self, f_1=9, f_2=5, f_3=5	):
-		super(Srcnn, self).__init__()
-
-		self.stack = nn.Sequential(
-			nn.Conv2d(in_channels=3, out_channels=3, kernel_size=f_1, stride=1),
-			nn.ReLU(),
-
-			nn.Conv2d(in_channels=3, out_channels=3, kernel_size=f_2, stride=1),
-			nn.ReLU(),	
-
-			nn.Conv2d(in_channels=3, out_channels=3, kernel_size=f_3, stride=1)
-			)
-		
-	def forward(self, x):
-		return self.stack(x)
-    
-    
-
 class CompactObjectConv(torch.nn.Module):
     """
     This network is designed to learn a subgrid model for star and black hole

@@ -2,13 +2,14 @@
 Script used to train networks with chosen architecture and datasets
 """
 
-import sys
 import os
+import sys
 current_dir = os.getcwd()
-current_dir = current_dir.replace("\\", "/") # this line is here for windows, if on linux this does nothing
-parent_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
-parent_dir = parent_dir.replace("\\", "/")
-sys.path.append(parent_dir)
+top_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
+sys.path.append(top_dir)
+top_dir = top_dir.replace("\\", "/")
+
+DATA_DIR = top_dir + "/data/random_data"
 
 import time
 import torch
@@ -20,13 +21,13 @@ from subgrid_physics_modelling import networks as net
 from subgrid_physics_modelling import network_training_utils as ntu
 
 # path to directory containing training data
-DATA_DIR = current_dir + "/../../../data/random_data/"
+DATA_DIR = top_dir + "/data/random_data/"
 
 # hyperparameters
 LEARNING_RATE = 1e-4
-EPOCHS        = 20
+EPOCHS        = 100
 BATCH_SIZE    = 64
-BL            = 4
+BL            = 8
 
 # loadng network architecture, choosing optimiser and loss function
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -36,8 +37,8 @@ loss_fn = nn.CrossEntropyLoss()
 
 # loading and batching saved datasets from chosen locations
 print("[INFO] Loading datasets")
-train_data = torch.load(DATA_DIR + f"fast_{BL}_cubed/training.pt")
-test_data  = torch.load(DATA_DIR + f"fast_{BL}_cubed/validation.pt")
+train_data = torch.load(DATA_DIR + f"/datasets/training_{BL}.pt")
+test_data  = torch.load(DATA_DIR + f"/datasets/validation_{BL}.pt")
 
 print("[INFO] Batching Data")
 train_data = data_utils.batch_classified_data(train_data, BATCH_SIZE)
@@ -84,10 +85,10 @@ for epoch in range(1, EPOCHS+1):
     if epoch == 1:
         plt.legend()
     plt.xlabel("Epoch")
-    plt.savefig("plot")
+    plt.savefig(DATA_DIR + f"/plots/Kernel1_conv_{BL}c")
 
     # saving network weights 
-    torch.save(model.state_dict(), DATA_DIR + f"Kernel1_conv_{BL}c.pt")
+    torch.save(model.state_dict(), DATA_DIR + f"/network_weights/Kernel1_conv_{BL}c.pt")
     
 print("[INFO] Done! :D")
 plt.show()
