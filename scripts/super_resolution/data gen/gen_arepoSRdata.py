@@ -14,19 +14,24 @@ DATA_DIR = top_dir + "/data/super_resolution/datasets"
 from subgrid_physics_modelling import data_utils as du
 
 # parameters
-SCALE_FACTOR = 16
+SCALE_FACTOR = 8
 IMAGE_SLICE_SIZE = 32 # keep the scale factor as a multiple of the scale factor
-BIG_TENSORS = 5 # max = 125
-CHANNEL_NUM = 0
-SCALE_DATA = 1e+28
+BIG_TENSORS = 16 # max = 16
+SCALE_DATA = 1#1e+24
 
 print("[INFO] Loading data")
-tensors_dict = np.load(DATA_DIR + "/snap_007_tensors.npz")
+tensors_dict = np.load(DATA_DIR + "/tensors128.npz")
+print(len(tensors_dict))
 
 tensors_list = []
 tick = 0
 for key in tensors_dict:
-    tensors_list.append(torch.tensor(tensors_dict[key]).permute(3, 0, 1, 2)[CHANNEL_NUM] * SCALE_DATA)
+    print(tensors_dict[key].shape)
+
+    tensors_list.append((torch.tensor(tensors_dict[key]).float()) * SCALE_DATA)
+
+    for i in range(len(tensors_list)):
+        print(tensors_list[i])
 
     percentage = round(100 * (tick)/BIG_TENSORS, 1)
     print(f"{percentage}%", end="\r")

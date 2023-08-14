@@ -74,7 +74,6 @@ def plot_figs(name, tensors_list):
         plt.imshow(image.detach())
         plt.axis("off")
         plt.title(f"{psnr}")
-        #plt.clim(cbar_min, cbar_max)
         plt.colorbar()
 
     plt.savefig(DATA_DIR + f"/plots/{name}")
