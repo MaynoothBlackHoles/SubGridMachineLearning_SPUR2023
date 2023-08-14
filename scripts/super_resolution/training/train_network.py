@@ -25,12 +25,12 @@ from subgrid_physics_modelling import synthetic_data_generation as sdg
 # hyperparameters
 LEARNING_RATE = 1e-4
 EPOCHS        = 100
-BATCH_SIZE    = 32
+BATCH_SIZE    = 4
 
 # dataset features
-SCALE_FACTOR     = 8
+SCALE_FACTOR     = 16
 IMAGE_SLICE_SIZE = 32
-BIG_TENSORS      = 5
+BIG_TENSORS      = 1
 
 bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 
@@ -73,13 +73,13 @@ for i in range(EPOCHS):
     random.shuffle(c)
     scaled, origial = zip(*c)
 
-    dataset["training"] = [scaled, origial]
+    training = [scaled, origial]
 
     print("Batching Data")
-    dataset["training"] = sdg.batch_classified_data(dataset["training"], BATCH_SIZE, pytorch_hijinks=True)
+    training = sdg.batch_classified_data(training, BATCH_SIZE, pytorch_hijinks=True)
 
     # training, testing and evaluating chosen metric and loss
-    ntu.sr_train_loop(dataset["training"], model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
+    ntu.sr_train_loop(training, model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
     ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_logMSE)
     
     time_end = time.time()
