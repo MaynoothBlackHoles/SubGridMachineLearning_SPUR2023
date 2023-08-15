@@ -28,21 +28,23 @@ EPOCHS        = 100
 BATCH_SIZE    = 4
 
 # dataset features
-SCALE_FACTOR     = 16
+SCALE_FACTOR     = 4
 IMAGE_SLICE_SIZE = 32
 BIG_TENSORS      = 1
 
-bicubic_logmse = {"sf 8": 32, "sf 16": 22}
+#bicubic_logmse = {"sf 8": 32, "sf 16": 22}
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.CNN_3D(depth        = 3,
-                   channels     = 1,
-                   mid_channels = 16,
-                   kernel_front = 9
-                   ).to(device)
+model = net.Residual_CNN_3D(depth        = 3,
+                            channels     = 1,
+                            mid_channels = 64,
+                            kernel_front = 9,
+                            kernel_mid   = 1,
+                            kernel_end   = 5
+                            ).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_fn = nn.MSELoss()
 
@@ -79,8 +81,8 @@ for i in range(EPOCHS):
     training = sdg.batch_classified_data(training, BATCH_SIZE, pytorch_hijinks=True)
 
     # training, testing and evaluating chosen metric and loss
-    ntu.sr_train_loop(training, model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
-    ntu.sr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_logMSE)
+    ntu.vdsr_train_loop(training, model, loss_fn, device, optimizer, stats["train metric"], stats["train loss"], metric_func=ntu.eval_logMSE)
+    ntu.vdsr_test_loop(dataset["validation"], model, loss_fn, device, stats["test metric"], stats["test loss"], metric_func=ntu.eval_logMSE)
     
     time_end = time.time()
     print(f"time taken for epoch {round((time_end - time_start)/60, 2)} mins \n")
@@ -94,7 +96,7 @@ for i in range(EPOCHS):
     plt.subplot(211)
     plt.plot(epochs_list, stats[f"train metric"], label="train", color="green")
     plt.plot(epochs_list, stats["test metric"], label="test", color="red")
-    plt.plot(epochs_list, ones_list * bicubic_logmse[f"sf {SCALE_FACTOR}"], label="test", color="red")
+    #plt.plot(epochs_list, ones_list * bicubic_logmse[f"sf {SCALE_FACTOR}"], label="test", color="red")
 
     plt.ylabel(metric_name)
     plt.legend()

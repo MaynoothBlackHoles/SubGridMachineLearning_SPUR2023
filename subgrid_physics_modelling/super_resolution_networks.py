@@ -79,7 +79,7 @@ class VDSRcnn(torch.nn.Module):
 		return y
 
 class Residual_CNN_3D(torch.nn.Module):
-	def __init__(self, depth=3, channels=6, mid_channels=64, kernel_front=3, kernel_mid=3, kernel_end=3):
+	def __init__(self, depth=3, channels=1, mid_channels=64, kernel_front=9, kernel_mid=1, kernel_end=5):
 		super().__init__()
 
 		self.depth = depth
@@ -111,14 +111,14 @@ class Residual_CNN_3D(torch.nn.Module):
 			)
 
 	def forward(self, x):
-		x = self.init_conv(x)
+		r = self.init_conv(x)
 
 		for i in range(self.depth - 2):
-			x = self.mid_conv(x)
+			r = self.mid_conv(r)
 
-		x = self.end_conv(x)
+		r = self.end_conv(r)
 		
-		y = x + x
+		y = r + x
 		return y
 	
 class CNN_3D(torch.nn.Module):

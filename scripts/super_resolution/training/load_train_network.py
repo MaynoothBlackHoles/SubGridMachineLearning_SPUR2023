@@ -23,22 +23,22 @@ from subgrid_physics_modelling import super_resolution_networks as net
 from subgrid_physics_modelling import synthetic_data_generation as sdg
 
 # hyperparameters
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 EPOCHS        = 40
-BATCH_SIZE    = 4
+BATCH_SIZE    = 16
 
 # dataset features
-SCALE_FACTOR     = 8
+SCALE_FACTOR     = 4
 IMAGE_SLICE_SIZE = 32
 BIG_TENSORS      = 16
 
-bicubic_logmse = {"sf 8": 32, "sf 16": 22}
+#bicubic_mse = {"sf 4": 1, "sf 8": 32, "sf 16": 22}
 
 # looking for gpu, if not we use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # loadng network architecture, choosing optimiser and loss function
-model = net.CNN_3D(depth=3, channels=1, mid_channels=32, kernel_front=3)
+model = net.CNN_3D(depth=3, channels=1, mid_channels=16, kernel_front=9)
 
 new_dict = {}
 for param_tensor in model.state_dict():
@@ -106,21 +106,21 @@ for i in range(EPOCHS):
     plt.subplot(211)
     plt.plot(epochs_list, stats[f"train metric"], label="train", color="green")
     plt.plot(epochs_list, stats["test metric"], label="test", color="red")
-    plt.plot(epochs_list, ones_list * bicubic_logmse[f"sf {SCALE_FACTOR}"], label="test", color="red")
     plt.ylabel(metric_name)
     plt.legend()
 
     plt.subplot(212)
     plt.plot(epochs_list, stats["train loss"], "--", label="train", color="darkgreen")
     plt.plot(epochs_list, stats["test loss"], "--", label="test", color="darkred")
+    #plt.plot(epochs_list, ones_list * bicubic_mse[f"sf {SCALE_FACTOR}"], label="test", color="red")
     plt.legend()
     plt.ylabel("Loss")
     plt.xlabel("Epoch")
 
-    plt.savefig(DATA_DIR + f"/plots/plot_cnn_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}")
+    plt.savefig(DATA_DIR + f"/plots/plot_idcnn_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}")
 
     # saving model network weights each epoch
-    torch.save(model.state_dict(), DATA_DIR + f"/network_weights/rcnn3d_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
+    torch.save(model.state_dict(), DATA_DIR + f"/network_weights/idcnn3d_{BIG_TENSORS}_{IMAGE_SLICE_SIZE}_{SCALE_FACTOR}.pt")
     
 print("[INFO] Done! :D")
 plt.show()
