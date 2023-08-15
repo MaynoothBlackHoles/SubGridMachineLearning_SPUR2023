@@ -264,9 +264,8 @@ def sr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[], 
 
 
 
-def residual_MSELoss(x, convoluted_x, y):
-    return torch.mean(torch.square((y - x) - convoluted_x))
-
+def residual_MSELoss(r, convoluted_x):
+    return torch.mean(torch.square((r) - convoluted_x))
 
 
 def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], loss_list=[], metric_func=eval_PSNR):
@@ -284,7 +283,7 @@ def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], 
     """
 
     total_loss = 0
-    total_PSNR = 0
+    total_metric = 0
         
     batches = (len(dataset))
     
@@ -296,21 +295,22 @@ def vdsr_train_loop(dataset, model, loss_fn, device, optimizer, metric_list=[], 
         (x, y) = (x.to(device), y.to(device))
 
         prediction = model(x)
-        loss = loss_fn(x, prediction - x, y)
+        loss = loss_fn(prediction - x, y - x)
 
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        total_loss += float(loss)
-        total_PSNR += metric_func(prediction, y)
+        loss = loss.item()
+        total_loss += loss
+        total_metric += metric_func(prediction, y)
 
-    avg_PSNR = total_PSNR / batches
+    avg_metric = total_metric / batches
     avg_loss = total_loss / batches
 
-    print(f"Train Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
+    print(f"Train Error: \n Average PSNR: {(avg_metric):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    metric_list.append(avg_PSNR)
+    metric_list.append(avg_metric)
 
 
 def vdsr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[],  metric_func=eval_PSNR):
@@ -330,7 +330,7 @@ def vdsr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[]
     model.eval()
 
     total_loss = 0
-    total_PSNR = 0
+    total_metric = 0
         
     batches = (len(dataset))
     
@@ -342,17 +342,18 @@ def vdsr_test_loop(dataset, model, loss_fn, device, metric_list=[], loss_list=[]
         (x, y) = (x.to(device), y.to(device))
 
         prediction = model(x)
-        loss = loss_fn(x, prediction - x, y)
+        loss = loss_fn(prediction - x, y - x)
 
-        total_loss += float(loss)
-        total_PSNR += metric_func(prediction, y)
+        loss = loss.item()
+        total_loss += loss
+        total_metric += metric_func(prediction, y)
 
-    avg_PSNR = total_PSNR / batches
+    avg_metric = total_metric / batches
     avg_loss = total_loss / batches
 
-    print(f"Test Error: \n Average PSNR: {(avg_PSNR):.3f}, Avg loss: {avg_loss:.5f} \n")
+    print(f"Test Error: \n Average PSNR: {(avg_metric):.3f}, Avg loss: {avg_loss:.5f} \n")
     loss_list.append(avg_loss)
-    metric_list.append(avg_PSNR)
+    metric_list.append(avg_metric)
 
 
 

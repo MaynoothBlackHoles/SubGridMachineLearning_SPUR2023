@@ -17,19 +17,14 @@ from subgrid_physics_modelling import network_training_utils as ntu
 from subgrid_physics_modelling import synthetic_data_generation as sdg
 
 # load your dataset
-dataset_name = "dataset_3_32_2.pt"
+dataset_name = "dataset_16_32_4.pt"
 test_data = torch.load(DATA_DIR + f"/{dataset_name}")
 
 bicubic_data = sdg.batch_classified_data(classified_dataset=test_data["training"], batch_size=1)
 
-
-# testing on loaded dataset
-data_SSIM = ntu.test_metric(bicubic_data, metric=ntu.eval_SSIM)
-data_PSNR = ntu.test_metric(bicubic_data, metric=ntu.eval_PSNR)
-
 print("-----------------------------")
-print(data_SSIM)
-print(data_PSNR)
+print(ntu.test_metric(bicubic_data, metric=ntu.eval_MSE))
+print(ntu.test_metric(bicubic_data, metric=ntu.eval_logMSE))
 
 
 """

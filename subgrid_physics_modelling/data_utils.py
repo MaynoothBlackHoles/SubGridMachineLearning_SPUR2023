@@ -90,7 +90,7 @@ def star_forming_ratio(classified_dataset):
 
 
 
-def tensor_slicer_3d(tensor, output_lenght):
+def tensor_slicer_3d(tensor, output_lenght, stride=16):
     """
     Slices given tensor into smaller volumes of desired side lenght
 
@@ -102,7 +102,16 @@ def tensor_slicer_3d(tensor, output_lenght):
     """
 
     matrices, x, y, z = tensor.shape
-    slices = []
+    slices = [] 
+
+    """def sigma_sum(start, end, expression):
+        return sum(expression(i) for i in range(start, end))
+
+    def dist(i):
+        return ((x - i*stride) - output_lenght)//stride
+
+    test = sigma_sum(0, output_lenght, dist)
+    print(test) """
 
     for i in range(x//output_lenght):
         for j in range(y//output_lenght):
@@ -113,6 +122,7 @@ def tensor_slicer_3d(tensor, output_lenght):
                 tensor_slice = tensor[:, x_start : x_start + output_lenght,
                                          y_start : y_start + output_lenght,
                                          z_start : z_start + output_lenght]
+                print(tensor_slice.shape)
                 tensor_slice = torch.reshape(tensor_slice, (1, matrices, output_lenght, output_lenght, output_lenght))
                 slices.append(tensor_slice)
     
